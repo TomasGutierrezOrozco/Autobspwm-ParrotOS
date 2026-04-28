@@ -1,0 +1,11 @@
+# Optional packages for secondary profiles/configs captured from this system.
+# These are not required for the main bspwm environment.
+
+lxterminal
+xfce4-terminal
+konsole
+i3-wm
+openbox
+lxpanel
+pcmanfm
+lxqt-config

@@ -1,0 +1,62 @@
+#!/bin/sh
+
+# Lanzar sxhkd si no está corriendo
+pgrep -x sxhkd > /dev/null || sxhkd &
+
+# Escritorios
+bspc monitor -d I II III IV V VI VII VIII IX X
+
+# Layout de monitores: extendido a la izquierda por defecto
+# "$HOME/.config/bspwm/scripts/monitor_layout.sh" extend
+
+# Configuración básica de bspwm
+bspc config border_width         2
+bspc config window_gap          12
+
+bspc config split_ratio          0.52
+bspc config borderless_monocle   true
+bspc config gapless_monocle      true
+
+# Reglas de ventanas
+bspc rule -a Gimp desktop='^8' state=floating follow=on
+bspc rule -a Chromium desktop='^2'
+bspc rule -a mplayer2 state=floating
+bspc rule -a Kupfer.py focus=on
+bspc rule -a Screenkey manage=off
+
+# Tema oscuro
+pkill xsettingsd 2>/dev/null
+xsettingsd -c "$HOME/.config/xsettingsd/xsettingsd.conf" &
+
+# Cursor personalizado
+xrdb -merge ~/.Xresources
+xsetroot -cursor_name left_ptr
+
+# Fondo de pantalla
+/usr/bin/feh --bg-fill "$HOME/.config/wallpapers/Fondo6.jpg" &
+
+# Polybar
+"$HOME/.config/polybar/launch2.sh" &
+
+# Compositor
+picom &
+
+# Borde a 0 (si no quieres bordes en ventanas)
+bspc config border_width 0
+
+# Touchpad con synaptics
+(
+    sleep 1
+    if command -v synclient >/dev/null 2>&1; then
+        synclient TouchpadOff=0 \
+                  TapButton1=1 TapButton2=3 TapButton3=2 \
+                  ClickFinger1=1 ClickFinger2=3 ClickFinger3=2 \
+                  MaxTapTime=180 \
+                  PalmDetect=1 PalmMinWidth=5 PalmMinZ=40 \
+                  VertTwoFingerScroll=1
+    fi
+) &
+
+
+# Fix para algunas apps Java
+wmname LG3D &

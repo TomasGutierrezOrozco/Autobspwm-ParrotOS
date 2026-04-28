@@ -1,0 +1,17 @@
+# Optional/manual items referenced by current keybindings or shell config.
+# They are not required for bspwm to start.
+
+powerlevel10k:
+  The installer clones https://github.com/romkatv/powerlevel10k.git into ~/powerlevel10k when git and internet are available.
+
+i3lock-fancy:
+  sxhkd maps Super+Shift+x to i3lock-fancy. If unavailable, install it manually or change that binding to i3lock.
+
+kitty from /opt:
+  The current system uses /opt/kitty/bin/kitty, but this project uses "kitty" through PATH for portability.
+
+VS Code / Windsurf themes:
+  Only safe user settings and keybindings were copied. History, globalStorage and extension state were intentionally excluded because they can contain tokens, secrets or project data.
+
+VSCodium:
+  The current system has codium installed, but no VSCodium User settings directory was present to copy.

@@ -1,0 +1,15 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+state="$(synclient -l | awk -F'=' '/TouchpadOff/ {gsub(/ /,"",$2); print $2; exit}')"
+
+if [[ -z "${state}" ]]; then
+  echo "No se encontró TouchpadOff en synclient -l"
+  exit 1
+fi
+
+if [[ "$state" == "0" ]]; then
+  synclient TouchpadOff=1
+else
+  synclient TouchpadOff=0
+fi

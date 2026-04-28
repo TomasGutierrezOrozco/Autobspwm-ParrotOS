@@ -1,0 +1,11 @@
+#!/usr/bin/env xdg-open
+
+[Desktop Entry]
+Version=1.0
+Type=Application
+Terminal=false
+Name[es_CO]=Kitty
+Exec=kitty
+Name=Kitty
+Icon=parrot-shellnoob
+Icon[es_CO]=parrot-shellnoob

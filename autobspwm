@@ -1,0 +1,46 @@
+#!/usr/bin/env bash
+set -Eeuo pipefail
+
+PROJECT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
+usage() {
+  cat <<'EOF'
+autobspwm-parrot
+
+Uso:
+  ./autobspwm install
+  ./autobspwm backup
+  ./autobspwm restore [YYYY-MM-DD_HH-MM-SS]
+  ./autobspwm uninstall
+  ./autobspwm check
+  ./autobspwm help
+EOF
+}
+
+cmd="${1:-help}"
+shift || true
+
+case "$cmd" in
+  install)
+    "$PROJECT_DIR/install.sh" "$@"
+    ;;
+  backup)
+    "$PROJECT_DIR/backup.sh" "$@"
+    ;;
+  restore)
+    "$PROJECT_DIR/restore.sh" "$@"
+    ;;
+  uninstall)
+    "$PROJECT_DIR/uninstall.sh" "$@"
+    ;;
+  check)
+    "$PROJECT_DIR/check.sh" "$@"
+    ;;
+  help|-h|--help)
+    usage
+    ;;
+  *)
+    usage
+    exit 1
+    ;;
+esac
