@@ -52,7 +52,7 @@ No ejecutes el instalador como `root`. El script instalará paquetes con `sudo` 
 Clona o copia el proyecto en el sistema destino:
 
 ```bash
-git clone <URL_DEL_REPOSITORIO> autobspwm-parrot
+git clone https://github.com/TomasGutierrezOrozco/Autobspwm-ParrotOS.git
 cd autobspwm-parrot
 ```
 
@@ -347,7 +347,7 @@ sudo apt upgrade
 3. Clona el repositorio:
 
 ```bash
-git clone <URL_DEL_REPOSITORIO> autobspwm-parrot
+git clone https://github.com/TomasGutierrezOrozco/Autobspwm-ParrotOS.git
 cd autobspwm-parrot
 ```
 
@@ -723,7 +723,7 @@ Do not run the installer as `root`. The installer uses `sudo` only when system-l
 Clone the repository:
 
 ```bash
-git clone <REPOSITORY_URL> Autobspwm-ParrotOS
+git clone https://github.com/TomasGutierrezOrozco/Autobspwm-ParrotOS.git
 cd Autobspwm-ParrotOS
 ```
 
