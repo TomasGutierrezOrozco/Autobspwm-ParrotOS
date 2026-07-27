@@ -40,7 +40,6 @@ zsh-syntax-highlighting
 
 # Additional personalization captured from this system
 neovim
-neofetch
 htop
 geany
 pluma

@@ -1,3 +1,4 @@
+export PATH="$HOME/.nvm/versions/node/v24.12.0/bin:$PATH"
 # Enable Powerlevel10k instant prompt. Should stay close to the top of ~/.zshrc.
 # Initialization code that may require console input (password prompts, [y/n]
 # confirmations, etc.) must go above this block; everything else may go below.
@@ -119,6 +120,64 @@ function extractPorts(){
 }
 
 
+ClearCache() {
+    echo "[*] Limpieza de caché para Parrot/Debian"
+    echo
+
+    echo "[*] Limpiando caché de APT..."
+    sudo apt-get clean
+    sudo apt-get autoclean
+
+    echo
+    echo "[*] Eliminando paquetes no necesarios..."
+    sudo apt-get autoremove --purge
+
+    echo
+    echo "[*] Purgando configuraciones residuales de paquetes eliminados..."
+    local residuals
+    residuals=$(dpkg -l | awk '/^rc/ {print $2}')
+
+    if [[ -n "$residuals" ]]; then
+        echo "$residuals" | xargs -r sudo apt-get purge
+    else
+        echo "    No hay configuraciones residuales."
+    fi
+
+    echo
+    echo "[*] Limpiando cachés comunes del usuario..."
+
+    [[ -d "$HOME/.cache/thumbnails" ]] && rm -rf "$HOME/.cache/thumbnails/"*
+    [[ -d "$HOME/.cache/pip" ]] && rm -rf "$HOME/.cache/pip/"*
+    [[ -d "$HOME/.cache/go-build" ]] && rm -rf "$HOME/.cache/go-build/"*
+
+    echo
+    echo "[*] Limpiando caché de npm si existe..."
+    if command -v npm >/dev/null 2>&1; then
+        npm cache clean --force
+    else
+        echo "    npm no está instalado."
+    fi
+
+    echo
+    echo "[*] Limpiando Flatpak si existe..."
+    if command -v flatpak >/dev/null 2>&1; then
+        flatpak uninstall --unused
+    else
+        echo "    Flatpak no está instalado."
+    fi
+
+    echo
+    echo "[*] Reduciendo logs antiguos de systemd..."
+    if command -v journalctl >/dev/null 2>&1; then
+        sudo journalctl --vacuum-time=7d
+    else
+        echo "    journalctl no está disponible."
+    fi
+
+    echo
+    echo "[+] Limpieza completada."
+}
+
 # To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
 [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
 
@@ -128,3 +187,4 @@ export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
 [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
 export PATH="$PATH:/usr/NX/bin:/etc/NX"
+export PATH="$HOME/.local/bin:$PATH"
