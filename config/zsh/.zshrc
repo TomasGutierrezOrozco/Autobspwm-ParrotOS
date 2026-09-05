@@ -148,26 +148,43 @@ function extractPorts(){
   rm extractPorts.tmp
 }
 
-# System clean function
+# System clean function (Multi-Distro: Arch Linux & Debian/Parrot/Kali)
 ClearCache() {
-    echo "[*] Limpieza de caché para Parrot/Debian"
+    echo "[*] Iniciando limpieza de caché del sistema..."
     echo
-    echo "[*] Limpiando caché de APT..."
-    sudo apt-get clean
-    sudo apt-get autoclean
-    echo
-    echo "[*] Eliminando paquetes no necesarios..."
-    sudo apt-get autoremove --purge
-    echo
-    echo "[*] Purgando configuraciones residuales de paquetes eliminados..."
-    local residuals
-    residuals=$(dpkg -l 2>/dev/null | awk '/^rc/ {print $2}')
-    if [[ -n "$residuals" ]]; then
-        echo "$residuals" | xargs -r sudo apt-get purge
-    else
-        echo "    No hay configuraciones residuales."
+
+    if command -v pacman >/dev/null 2>&1; then
+        echo "[*] Limpiando caché de Pacman..."
+        sudo pacman -Sc --noconfirm
+        echo
+        echo "[*] Verificando paquetes huérfanos en Arch Linux..."
+        local orphans
+        orphans=$(pacman -Qtdq 2>/dev/null || true)
+        if [[ -n "$orphans" ]]; then
+            echo "$orphans" | xargs -r sudo pacman -Rns --noconfirm
+        else
+            echo "    No hay paquetes huérfanos."
+        fi
+        echo
+    elif command -v apt-get >/dev/null 2>&1; then
+        echo "[*] Limpiando caché de APT..."
+        sudo apt-get clean
+        sudo apt-get autoclean
+        echo
+        echo "[*] Eliminando paquetes no necesarios en Debian/Parrot..."
+        sudo apt-get autoremove --purge -y
+        echo
+        echo "[*] Purgando configuraciones residuales de paquetes eliminados..."
+        local residuals
+        residuals=$(dpkg -l 2>/dev/null | awk '/^rc/ {print $2}')
+        if [[ -n "$residuals" ]]; then
+            echo "$residuals" | xargs -r sudo apt-get purge -y
+        else
+            echo "    No hay configuraciones residuales."
+        fi
+        echo
     fi
-    echo
+
     echo "[*] Limpiando cachés comunes del usuario..."
     [[ -d "$HOME/.cache/thumbnails" ]] && rm -rf "$HOME/.cache/thumbnails/"*
     [[ -d "$HOME/.cache/pip" ]] && rm -rf "$HOME/.cache/pip/"*
@@ -175,14 +192,14 @@ ClearCache() {
     echo
     echo "[*] Limpiando caché de npm si existe..."
     if command -v npm >/dev/null 2>&1; then
-        npm cache clean --force
+        npm cache clean --force 2>/dev/null || true
     else
         echo "    npm no está instalado."
     fi
     echo
     echo "[*] Limpiando Flatpak si existe..."
     if command -v flatpak >/dev/null 2>&1; then
-        flatpak uninstall --unused -y
+        flatpak uninstall --unused -y 2>/dev/null || true
     else
         echo "    Flatpak no está instalado."
     fi
@@ -194,7 +211,7 @@ ClearCache() {
         echo "    journalctl no está disponible."
     fi
     echo
-    echo "[+] Limpieza completada."
+    echo "[+] Limpieza completada con éxito."
 }
 
 # Source Powerlevel10k config

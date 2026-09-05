@@ -43,7 +43,7 @@ xrdb -merge ~/.Xresources
 xsetroot -cursor_name left_ptr
 
 # Fondo de pantalla
-/usr/bin/feh --bg-fill "$HOME/.config/wallpapers/Fondo6.jpg" &
+feh --bg-fill "$HOME/.config/wallpapers/Fondo6.jpg" &
 
 # Polybar
 "$HOME/.config/polybar/launch2.sh" &

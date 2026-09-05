@@ -1,2 +1,2 @@
 #!/bin/sh
-/usr/bin/feh --no-fehbg --bg-fill "$HOME/.config/wallpapers/Fondo6.jpg"
+feh --no-fehbg --bg-fill "$HOME/.config/wallpapers/Fondo6.jpg"
