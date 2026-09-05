@@ -5,7 +5,7 @@ powerlevel10k:
   The installer clones https://github.com/romkatv/powerlevel10k.git into ~/powerlevel10k when git and internet are available.
 
 i3lock-fancy:
-  sxhkd maps Super+Shift+x to i3lock-fancy. If unavailable, install it manually or change that binding to i3lock.
+  sxhkd maps Super+Shift+x to i3lock-fancy. The installer handles it automatically via APT (Debian), AUR (Arch), or by cloning and building from GitHub directly.
 
 kitty from /opt:
   The current system uses /opt/kitty/bin/kitty, but this project uses "kitty" through PATH for portability.

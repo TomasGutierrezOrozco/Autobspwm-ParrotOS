@@ -7,9 +7,9 @@
 [![Status Bar](https://img.shields.io/badge/Bar-Polybar%20%288%20Islands%29-purple?style=for-the-badge)](https://github.com/polybar/polybar)
 [![License](https://img.shields.io/badge/License-Custom%20Non--Commercial-red?style=for-the-badge)](LICENSE)
 
-Instalador automatizado e interactivo para desplegar un entorno de trabajo profesional, minimalista y de alto rendimiento basado en **BSPWM** sobre **Arch Linux**, **Parrot Security OS** y **Kali Linux**.
+Instalador automatizado, modular y robusto para desplegar un entorno de trabajo profesional, minimalista y de alto rendimiento basado en **BSPWM** sobre **Arch Linux** (y derivados como EndeavourOS, BlackArch y Manjaro), **Parrot Security OS** y **Kali Linux**.
 
-El proyecto incluye un rice estético moderno (Nord / Tokyo Night), compositor Picom de ultra bajo consumo, barra de estado Polybar en 8 islas modulares, OSD en tiempo real para volumen y brillo, terminal Kitty, utilidades de pentesting integradas y sincronización total de entorno con el usuario **root** (icono distintivo de la llama en el prompt).
+El proyecto incluye un rice moderno (Nord / Tokyo Night), compositor Picom de ultra bajo consumo, barra de estado Polybar en 8 islas modulares, OSD en tiempo real para volumen y brillo, terminal Kitty, utilidades de pentesting integradas en la shell y sincronización total de entorno con el usuario **root** (icono distintivo de la llama en el prompt).
 
 ---
 
@@ -28,27 +28,29 @@ El proyecto incluye un rice estético moderno (Nord / Tokyo Night), compositor P
 
 ## Características Principales
 
-- **Instalador Interactivo y Autónomo:** Menú con banners ASCII en color, confirmaciones paso a paso, prechequeo de dependencias y opción de instalación desatendida (`-y`).
-- **Gestión de Ventanas Avanzada:** `bspwm` y `sxhkd` con atajos ergonómicos, redimensionamiento inteligente (`bspwm_resize`) y reglas para ventanas flotantes.
+- **Instalador Multi-Distribución Inteligente:** Detecta automáticamente si el sistema es Arch Linux o Debian/Parrot/Kali y despacha la instalación de paquetes con `pacman` o `apt`. Incluye soporte para helpers de AUR (`yay` / `paru`), prechequeo de conectividad y modo desatendido (`-y`).
+- **Gestión de Ventanas Avanzada:** `bspwm` y `sxhkd` con atajos ergonómicos, redimensionamiento inteligente (`bspwm_resize`), apertura guiada por preselección y reglas para ventanas flotantes.
 - **Polybar en 8 Islas Modulares:**
   1. *Log / Logo*: Menú interactivo de aplicaciones.
-  2. *Ethernet Status*: Detección automática de la interfaz de red activa (Wi-Fi o cable Ethernet).
+  2. *Ethernet Status*: Detección dinámica de la interfaz de red activa (Wi-Fi o cable Ethernet).
   3. *VPN Status*: Detección dinámica y priorizada para `tun*` (HackTheBox / TryHackMe / OpenVPN), `wg*` (WireGuard) y `tailscale*`.
   4. *Secondary Bar*: Fecha y hora con formato extendido.
   5. *Workspaces (Centro)*: Renderizado interactivo de los escritorios virtuales (`I` al `X`).
   6. *Target Status*: Monitor en vivo para objetivos de pentesting (`settarget` / `cleartarget`).
   7. *Primary Bar*: Menú de apagado, reinicio, suspensión y bloqueo de sesión.
-- **Notificaciones y OSD con Dunst:** Tema Nord integrado, bordes redondeados (12px), anulación de servicios D-Bus para evitar colisiones con MATE y barras de progreso fluidas para el control de volumen y brillo en pantalla.
-- **Compositor Picom de Alto Rendimiento:** Desenfoque `dual_kawase`, sombras suaves, esquinas redondeadas (20px), sincronización vertical (`vsync = true`) y seguimiento de daños (`use-damage = true`) para evitar el consumo excesivo de CPU y ahorrar batería en laptops.
+- **Notificaciones y OSD con Dunst:** Tema Nord integrado, bordes redondeados (12px), anulación de colisiones con demonios de escritorio y barras de progreso fluidas para el control de volumen y brillo en pantalla.
+- **Compositor Picom de Alto Rendimiento:** Desenfoque `dual_kawase`, sombras suaves, esquinas redondeadas (20px), sincronización vertical (`vsync = true`) y seguimiento de daños (`use-damage = true`) para evitar consumo excesivo de CPU y ahorrar batería.
+- **Controlador de Touchpad Híbrido:** Detección automática en tiempo real tanto para controladores legacy `synaptics` (`synclient`) como para controladores modernos `libinput` (`xinput`), con notificaciones OSD al alternar con `Super + Alt + t`.
+- **Bloqueo y Cursores Autónomos:** Mecanismos de despliegue directo para `i3lock-fancy` y el tema de cursor `Bibata-Modern-Ice` desde repositorios oficiales, garantizando funcionamiento inmediato incluso sin helpers de AUR configurados.
 - **Lanzador Rofi:** Modo `drun` con iconos y tema moderno `rounded-nord-dark.rasi`.
 - **Terminal Kitty & Editor Neovim:** Paleta Tokyo Night, pestañas con estilo Powerline y suite Neovim preconfigurada con NvChad.
-- **Zsh + Powerlevel10k:** Autocompletado enriquecido con colores, historial persistente, plugins (`autosuggestions`, `syntax-highlighting`, `sudo`) y utilidades CLI modernas (`lsd`, `batcat`, `fzf`, `xclip`).
+- **Zsh + Powerlevel10k Multi-Distro:** Autocompletado enriquecido con colores, historial persistente, plugins (`autosuggestions`, `syntax-highlighting`), atajo nativo de doble escape (`ESC ESC`) para anteponer `sudo`, y compatibilidad automática tanto con `batcat` como con `bat`.
 - **Funciones de Pentesting Integradas en Shell:**
   - `extractPorts`: Parsea capturas grepeables de Nmap, formatea la salida y copia automáticamente los puertos abiertos al portapapeles.
   - `settarget` / `cleartarget`: Configura o limpia la IP y nombre del objetivo en Polybar.
   - `mkt`: Genera en un segundo la estructura estándar de directorios para auditorías (`nmap/`, `content/`, `exploits/`).
-  - `ClearCache`: Script de mantenimiento que limpia cachés de APT, Flatpak, Thumbnails, pip, compilaciones de Go y logs de systemd.
-- **Paridad Completa con Usuario Root:** Sincronización automática de Zsh, Neovim, Kitty y prompt de Powerlevel10k personalizado con el distintivo icono de la llama.
+  - `ClearCache`: Script de mantenimiento que limpia cachés de paquetes, thumbnails, pip, Go y logs de systemd.
+- **Paridad Completa con Usuario Root:** Sincronización automática de Zsh, Neovim, Kitty y prompt de Powerlevel10k personalizado con el distintivo icono de la llama para el usuario root.
 - **Tipografías Incluidas:** Familia completa de `Hack Nerd Font` (12 variantes), `Iosevka Nerd Font`, `Hurmit Nerd Font Mono`, `Helvetica` y `Feather Icons`.
 - **Seguridad y Respaldo:** Backup automático fechado en `~/.backup-autobspwm/` antes de tocar cualquier archivo, con scripts de restauración (`restore.sh`) y desinstalación limpia (`uninstall.sh`).
 
@@ -56,31 +58,33 @@ El proyecto incluye un rice estético moderno (Nord / Tokyo Night), compositor P
 
 ## Requisitos del Sistema
 
-- **Distribución:** Arch Linux (y derivados como EndeavourOS, BlackArch, Manjaro), Parrot Security OS 6.x / 7.x, Kali Linux 2024.x / 2025.x.
-- **Servidor Gráfico:** X11.
-- **Usuario:** Usuario normal con privilegios de `sudo`.
+- **Distribuciones Soportadas:**
+  - **Arch Linux** y derivados: EndeavourOS, BlackArch, Manjaro, etc.
+  - **Debian / Ubuntu** y derivados: Parrot Security OS 6.x / 7.x, Kali Linux 2024.x / 2025.x.
+- **Servidor Gráfico:** X11 (`xorg-server` / `xorg-xinit`).
+- **Usuario:** Usuario regular con privilegios de `sudo`.
 - **Conexión a Internet:** Requerida durante la primera instalación para descargar paquetes y dependencias.
 
 > [!IMPORTANT]
-> Ejecuta el instalador con tu usuario normal. Si requieres permisos administrativos, el script solicitará tu contraseña de `sudo` de forma segura.
+> Ejecuta el instalador con tu usuario normal. Si se requieren privilegios administrativos, el script solicitará tu contraseña de `sudo` de forma segura.
 
 ---
 
 ## Instalación Rápida
 
-1. **Clona el repositorio en tu máquina:**
+1. **Clonar el repositorio:**
    ```bash
-   git clone https://github.com/TomasGutierrezOrozco/Autobspwm-ParrotOS.git
+   git clone -b arch-linux https://github.com/TomasGutierrezOrozco/Autobspwm-ParrotOS.git
    cd Autobspwm-ParrotOS
    ```
 
-2. **Ejecuta el instalador:**
+2. **Ejecutar el instalador interactivo:**
    ```bash
    ./install.sh
    ```
 
 3. **(Opcional) Instalación Desatendida:**
-   Si deseas realizar una instalación automática sin preguntas interactivas:
+   Si deseas realizar una instalación automática sin solicitudes interactivas:
    ```bash
    ./install.sh -y
    ```
@@ -90,7 +94,7 @@ El proyecto incluye un rice estético moderno (Nord / Tokyo Night), compositor P
    ```bash
    sudo reboot
    ```
-   En la pantalla de inicio de sesión (Display Manager), asegúrate de seleccionar **bspwm** en el menú de sesiones.
+   En la pantalla de inicio de sesión (Display Manager), selecciona **bspwm** en el menú de sesiones.
 
 ---
 
@@ -158,7 +162,7 @@ Los atajos están orquestados por `sxhkd` (`~/.config/sxhkd/sxhkdrc`).
 | `XF86AudioMute` | Alterna el silenciado (Mute) con indicador visual |
 | `XF86MonBrightnessUp` | Aumenta el brillo de pantalla un 5% con OSD |
 | `XF86MonBrightnessDown` | Reduce el brillo de pantalla un 5% con OSD |
-| `Super + Alt + t` | Alterna entre activar o desactivar el Touchpad (`synclient`) |
+| `Super + Alt + t` | Alterna el Touchpad (soporte dual `synclient` y `libinput`) con notificación OSD |
 
 ### 6. Control Multi-Monitor (`xrandr`)
 
@@ -168,6 +172,14 @@ Los atajos están orquestados por `sxhkd` (`~/.config/sxhkd/sxhkdrc`).
 | `Super + Alt + m` | Duplica la pantalla (modo espejo nativo) |
 | `Super + Alt + Shift + m` | Duplica con escalado automático para resoluciones dispares |
 | `Super + Alt + i` | Desactiva pantallas externas y activa solo la pantalla interna |
+
+### 7. Atajos de Shell y Terminal
+
+| Atajo | Acción |
+| :--- | :--- |
+| `Esc Esc` | Antepone automáticamente `sudo` al comando actual en Zsh |
+| `Tab` | Autocompletado interactivo de dos dimensiones con menú navegable |
+| `Ctrl + r` | Búsqueda interactiva en el historial de comandos mediante FZF |
 
 ---
 
@@ -197,7 +209,7 @@ ClearCache
 
 ### Alias de Productividad:
 - `ls`, `ll`, `la`, `lla` -> Reemplazados por `lsd` con iconos y directorios primero.
-- `cat`, `catn`, `catnp` -> Reemplazados por `batcat` con resaltado de sintaxis.
+- `cat`, `catn`, `catnp` -> Reemplazados por `bat` (Arch) o `batcat` (Debian) con resaltado de sintaxis.
 - `wifi` -> Lanza el asistente interactivo `nmtui`.
 - `bluetooth` -> Lanza `blueman-manager`.
 - `vpn-on` / `vpn-off` / `vpn-status` -> Control rápido de Tailscale.
@@ -208,25 +220,29 @@ ClearCache
 
 ```text
 Autobspwm-ParrotOS/
-├── install.sh                  # Instalador maestro interactivo
+├── install.sh                  # Instalador maestro interactivo multi-distro
 ├── autobspwm                   # Wrapper CLI unificado (install, check, backup, restore)
 ├── check.sh                    # Validador de dependencias, permisos y seguridad
 ├── backup.sh                   # Motor de copias de seguridad automáticas
 ├── restore.sh                  # Restaurador de backups previos
 ├── uninstall.sh                # Desinstalador seguro con reversión
+├── docs/
+│   └── arch-linux.md           # Guía técnica de instalación y arquitectura para Arch Linux
 ├── packages/
+│   ├── README.md               # Tabla de equivalencias de paquetes (Debian vs Arch Linux)
 │   ├── apt.txt                 # Lista oficial de paquetes para Debian/Parrot/Kali (APT)
 │   ├── pacman.txt              # Lista oficial de paquetes para Arch Linux (Pacman)
-│   └── aur.txt                 # Paquetes complementarios de AUR (yay/paru)
+│   ├── aur.txt                 # Paquetes de AUR recomendados (yay/paru)
+│   └── manual.txt              # Registro de componentes y configuraciones autónomas
 ├── lib/
-│   └── common.sh               # Librería común de colores, logging y helpers
+│   └── common.sh               # Librería común de colores, logging, detección y helpers
 ├── system/
-│   ├── dbus/                   # Prioridad exclusiva para el demonio Dunst
-│   └── xsession/               # Registro de sesión para el gestor de login (GDM/LightDM)
+│   ├── dbus/                   # Configuración para prioridad del demonio Dunst
+│   └── xsession/               # Registro de sesión para el gestor de login (GDM/LightDM/SDDM)
 └── config/
-    ├── bspwm/                  # bspwmrc y scripts (osd, resize, vpn, ethernet, target)
+    ├── bspwm/                  # bspwmrc y scripts (osd, resize, vpn, ethernet, target, monitor)
     ├── sxhkd/                  # sxhkdrc con atajos ergonómicos y multimedia
-    ├── polybar/                # Arquitectura modular de 8 islas y scripts
+    ├── polybar/                # Arquitectura modular de 8 islas y scripts de monitoreo
     ├── picom/                  # picom.conf (GLX, dual-kawase, use-damage)
     ├── dunst/                  # dunstrc con estilo Nord y barras de progreso
     ├── rofi/                   # config.rasi y temas redondeados
@@ -262,7 +278,7 @@ Los respaldos se almacenan con marca de tiempo en `~/.backup-autobspwm/YYYY-MM-D
 ```bash
 ./autobspwm uninstall
 ```
-El desinstalador retira las configuraciones instaladas, ofrece restaurar el respaldo original y pregunta si deseas purgar los paquetes instalados.
+El desinstalador retira las configuraciones instaladas, ofrece restaurar el respaldo original y pregunta si deseas desinstalar los paquetes del sistema correspondientes a tu distribución (`pacman` o `apt`).
 
 ---
 
@@ -274,7 +290,11 @@ Antes o después de desplegar, puedes verificar el estado del entorno ejecutando
 ./check.sh
 ```
 
-El script validará que todos los ejecutables tengan los permisos correctos, que los paquetes necesarios estén disponibles y garantizará que no exista ninguna fuga de credenciales o rutas privadas.
+El script validará:
+- Que todos los scripts tengan permisos de ejecución correctos.
+- Que todos los comandos requeridos y opcionales estén instalados.
+- Que los paquetes de tu distribución (`apt` o `pacman`) estén al día.
+- Que no exista ninguna fuga de credenciales, tokens, NAS ni rutas privadas.
 
 ---
 
