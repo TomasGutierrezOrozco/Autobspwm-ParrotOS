@@ -14,9 +14,38 @@ elif [ -f "/usr/share/powerlevel10k/powerlevel10k.zsh-theme" ]; then
 fi
 
 # Zsh plugins
-[ -f /usr/share/zsh-autosuggestions/zsh-autosuggestions.zsh ] && source /usr/share/zsh-autosuggestions/zsh-autosuggestions.zsh
-[ -f /usr/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh ] && source /usr/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
-[ -f /usr/share/zsh-sudo/sudo.plugin.zsh ] && source /usr/share/zsh-sudo/sudo.plugin.zsh
+for p in /usr/share/zsh-autosuggestions/zsh-autosuggestions.zsh /usr/share/zsh/plugins/zsh-autosuggestions/zsh-autosuggestions.zsh; do
+  [ -f "$p" ] && { source "$p"; break; }
+done
+for p in /usr/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh /usr/share/zsh/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh; do
+  [ -f "$p" ] && { source "$p"; break; }
+done
+
+# Sudo plugin / fallback nativo para doble escape
+SUDO_LOADED=0
+for p in /usr/share/zsh-sudo/sudo.plugin.zsh /usr/share/zsh/plugins/zsh-sudo/sudo.plugin.zsh; do
+  if [ -f "$p" ]; then
+    source "$p"
+    SUDO_LOADED=1
+    break
+  fi
+done
+
+if [ "$SUDO_LOADED" -eq 0 ]; then
+  # Implementación nativa de sudo en línea de comandos (doble Escape)
+  sudo-command-line() {
+    [[ -z $BUFFER ]] && zle up-history
+    if [[ $BUFFER == sudo\ * ]]; then
+      LBUFFER="${LBUFFER#sudo }"
+    elif [[ $BUFFER =~ ^[[:space:]]*$ ]]; then
+      return
+    else
+      LBUFFER="sudo $LBUFFER"
+    fi
+  }
+  zle -N sudo-command-line
+  bindkey "\e\e" sudo-command-line
+fi
 
 # History
 HISTFILE=~/.zsh_history
@@ -48,10 +77,16 @@ zstyle ':completion:*:kill:*' command 'ps -u $USER -o pid,%cpu,tty,cputime,cmd'
 
 # Custom Aliases
 # -----------------------------------------------
-# bat
-alias cat='batcat'
-alias catn='batcat --style=plain'
-alias catnp='batcat --style=plain --paging=never'
+# bat / batcat
+if command -v batcat >/dev/null 2>&1; then
+  alias cat='batcat'
+  alias catn='batcat --style=plain'
+  alias catnp='batcat --style=plain --paging=never'
+elif command -v bat >/dev/null 2>&1; then
+  alias cat='bat'
+  alias catn='bat --style=plain'
+  alias catnp='bat --style=plain --paging=never'
+fi
 
 # ls
 alias ll='lsd -lh --group-dirs=first'
@@ -111,26 +146,43 @@ function extractPorts(){
   rm extractPorts.tmp
 }
 
-# System clean function
+# System clean function (Multi-Distro: Arch Linux & Debian/Parrot/Kali)
 ClearCache() {
-    echo "[*] Limpieza de caché para Parrot/Debian"
+    echo "[*] Iniciando limpieza de caché del sistema..."
     echo
-    echo "[*] Limpiando caché de APT..."
-    sudo apt-get clean
-    sudo apt-get autoclean
-    echo
-    echo "[*] Eliminando paquetes no necesarios..."
-    sudo apt-get autoremove --purge
-    echo
-    echo "[*] Purgando configuraciones residuales de paquetes eliminados..."
-    local residuals
-    residuals=$(dpkg -l 2>/dev/null | awk '/^rc/ {print $2}')
-    if [[ -n "$residuals" ]]; then
-        echo "$residuals" | xargs -r sudo apt-get purge
-    else
-        echo "    No hay configuraciones residuales."
+
+    if command -v pacman >/dev/null 2>&1; then
+        echo "[*] Limpiando caché de Pacman..."
+        sudo pacman -Sc --noconfirm
+        echo
+        echo "[*] Verificando paquetes huérfanos en Arch Linux..."
+        local orphans
+        orphans=$(pacman -Qtdq 2>/dev/null || true)
+        if [[ -n "$orphans" ]]; then
+            echo "$orphans" | xargs -r sudo pacman -Rns --noconfirm
+        else
+            echo "    No hay paquetes huérfanos."
+        fi
+        echo
+    elif command -v apt-get >/dev/null 2>&1; then
+        echo "[*] Limpiando caché de APT..."
+        sudo apt-get clean
+        sudo apt-get autoclean
+        echo
+        echo "[*] Eliminando paquetes no necesarios en Debian/Parrot..."
+        sudo apt-get autoremove --purge -y
+        echo
+        echo "[*] Purgando configuraciones residuales de paquetes eliminados..."
+        local residuals
+        residuals=$(dpkg -l 2>/dev/null | awk '/^rc/ {print $2}')
+        if [[ -n "$residuals" ]]; then
+            echo "$residuals" | xargs -r sudo apt-get purge -y
+        else
+            echo "    No hay configuraciones residuales."
+        fi
+        echo
     fi
-    echo
+
     echo "[*] Limpiando cachés comunes del usuario..."
     [[ -d "$HOME/.cache/thumbnails" ]] && rm -rf "$HOME/.cache/thumbnails/"*
     [[ -d "$HOME/.cache/pip" ]] && rm -rf "$HOME/.cache/pip/"*
@@ -138,14 +190,14 @@ ClearCache() {
     echo
     echo "[*] Limpiando caché de npm si existe..."
     if command -v npm >/dev/null 2>&1; then
-        npm cache clean --force
+        npm cache clean --force 2>/dev/null || true
     else
         echo "    npm no está instalado."
     fi
     echo
     echo "[*] Limpiando Flatpak si existe..."
     if command -v flatpak >/dev/null 2>&1; then
-        flatpak uninstall --unused -y
+        flatpak uninstall --unused -y 2>/dev/null || true
     else
         echo "    Flatpak no está instalado."
     fi
@@ -157,7 +209,7 @@ ClearCache() {
         echo "    journalctl no está disponible."
     fi
     echo
-    echo "[+] Limpieza completada."
+    echo "[+] Limpieza completada con éxito."
 }
 
 # Source Powerlevel10k config

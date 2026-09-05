@@ -43,7 +43,7 @@ xrdb -merge ~/.Xresources
 xsetroot -cursor_name left_ptr
 
 # Fondo de pantalla
-/usr/bin/feh --bg-fill "$HOME/.config/wallpapers/Fondo6.jpg" &
+feh --bg-fill "$HOME/.config/wallpapers/Fondo6.jpg" &
 
 # Polybar
 "$HOME/.config/polybar/launch2.sh" &
@@ -65,16 +65,25 @@ fi
 # Borde a 0 (si no quieres bordes en ventanas)
 bspc config border_width 0
 
-# Touchpad con synaptics
+# Touchpad: Soporte hibrido (synaptics y libinput)
 (
     sleep 1
-    if command -v synclient >/dev/null 2>&1; then
+    if command -v synclient >/dev/null 2>&1 && synclient -l >/dev/null 2>&1; then
         synclient TouchpadOff=0 \
                   TapButton1=1 TapButton2=3 TapButton3=2 \
                   ClickFinger1=1 ClickFinger2=3 ClickFinger3=2 \
                   MaxTapTime=180 \
                   PalmDetect=1 PalmMinWidth=5 PalmMinZ=40 \
                   VertTwoFingerScroll=1
+    elif command -v xinput >/dev/null 2>&1; then
+        # Activar toque para hacer clic (tapping) y scroll natural en libinput
+        for id in $(xinput list --id-only 2>/dev/null); do
+            props=$(xinput list-props "$id" 2>/dev/null || true)
+            if echo "$props" | grep -qi "libinput Tapping Enabled"; then
+                xinput set-prop "$id" "libinput Tapping Enabled" 1 2>/dev/null || true
+                xinput set-prop "$id" "libinput Natural Scrolling Enabled" 0 2>/dev/null || true
+            fi
+        done
     fi
 ) &
 

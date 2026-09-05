@@ -24,15 +24,19 @@ case $chosen in
         systemctl reboot
         ;;
     $lock)
-        i3lock
+        if command -v i3lock-fancy >/dev/null 2>&1; then
+            i3lock-fancy
+        else
+            i3lock
+        fi
         ;;
     $suspend)
-        mpc -q pause
-        amixer set Master mute
+        mpc -q pause 2>/dev/null || true
+        amixer set Master mute 2>/dev/null || true
         systemctl suspend
         ;;
     $logout)
-        openbox --exit
+        bspc quit
         ;;
 esac
 
