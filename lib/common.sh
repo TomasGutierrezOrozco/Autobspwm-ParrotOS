@@ -2,27 +2,40 @@
 set -Eeuo pipefail
 
 PROJECT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-USER_HOME="${USER_HOME:-$HOME}"
+if [[ ${EUID:-$(id -u)} -eq 0 && -n "${SUDO_USER:-}" && "$SUDO_USER" != "root" ]]; then
+  TARGET_USER="${TARGET_USER:-$SUDO_USER}"
+  USER_HOME="${USER_HOME:-$(getent passwd "$SUDO_USER" 2>/dev/null | cut -d: -f6 || echo "/home/$SUDO_USER")}"
+else
+  TARGET_USER="${TARGET_USER:-$(logname 2>/dev/null || echo "${SUDO_USER:-$USER}")}"
+  USER_HOME="${USER_HOME:-$HOME}"
+fi
 BACKUP_ROOT="${BACKUP_ROOT:-$USER_HOME/.backup-autobspwm}"
 LOG_DIR="$PROJECT_DIR/logs"
 RUN_ID="${RUN_ID:-$(date +%F_%H-%M-%S)}"
 LOG_FILE="$LOG_DIR/autobspwm-$RUN_ID.log"
 BACKUP_DIR="${BACKUP_DIR:-$BACKUP_ROOT/$RUN_ID}"
+ASSUME_YES=0
 
 mkdir -p "$LOG_DIR"
 
 if [[ -t 1 ]]; then
   C_RESET=$'\033[0m'
+  C_BOLD=$'\033[1m'
   C_OK=$'\033[0;32m'
   C_WARN=$'\033[0;33m'
   C_ERROR=$'\033[0;31m'
   C_INFO=$'\033[0;36m'
+  C_MAGENTA=$'\033[0;35m'
+  C_BLUE=$'\033[0;34m'
 else
   C_RESET=""
+  C_BOLD=""
   C_OK=""
   C_WARN=""
   C_ERROR=""
   C_INFO=""
+  C_MAGENTA=""
+  C_BLUE=""
 fi
 
 log() {
@@ -39,6 +52,41 @@ error() { log "ERROR" "$C_ERROR" "$*"; }
 die() {
   error "$*"
   exit 1
+}
+
+print_banner() {
+  cat << "BANNER"
+
+       _         _         _                               
+      / \  _   _| |_ ___  | |__  ___ _ ____      ___ __ ___  
+     / _ \| | | | __/ _ \ | '_ \/ __| '_ \ \ /\ / / '_ ` _ \ 
+    / ___ \ |_| | || (_) || |_) \__ \ |_) \ V  V /| | | | | |
+   /_/   \_\__,_|\__\___/ |_.__/|___/ .__/ \_/\_/ |_| |_| |_|
+                                     |_|                      
+   >> Auto-BSPWM Installer para Parrot Security & Kali Linux <<
+   >> Rice & Shell Personalizado por Tomas Gutierrez (Fu11shoot) <<
+
+BANNER
+}
+
+prompt_confirm() {
+  local prompt="$1"
+  local default="${2:-Y}"
+
+  if [[ "$ASSUME_YES" -eq 1 ]]; then
+    return 0
+  fi
+
+  local choice
+  if [[ "$default" =~ ^[Yy]$ ]]; then
+    read -r -p "${C_BOLD}${prompt} [S/n]: ${C_RESET}" choice
+    choice="${choice:-S}"
+    [[ "$choice" =~ ^[sSyY]$ ]]
+  else
+    read -r -p "${C_BOLD}${prompt} [s/N]: ${C_RESET}" choice
+    choice="${choice:-N}"
+    [[ "$choice" =~ ^[sSyY]$ ]]
+  fi
 }
 
 require_user_context() {
@@ -59,9 +107,17 @@ read_package_list() {
   sed -e 's/#.*//' -e '/^[[:space:]]*$/d' "$file"
 }
 
-is_debian_based() {
-  [[ -r /etc/os-release ]] || return 1
-  grep -Eqi '^(ID|ID_LIKE)=.*(debian|parrot|ubuntu)' /etc/os-release
+detect_distro() {
+  if [[ -r /etc/os-release ]]; then
+    if grep -Eqi '^(ID|ID_LIKE)=.*(parrot|kali|debian|ubuntu)' /etc/os-release; then
+      echo "debian"
+      return 0
+    elif grep -Eqi '^(ID|ID_LIKE)=.*(arch|endeavouros|blackarch|manjaro)' /etc/os-release; then
+      echo "arch"
+      return 0
+    fi
+  fi
+  echo "unknown"
 }
 
 has_internet() {
@@ -69,7 +125,7 @@ has_internet() {
     curl -Is --connect-timeout 5 https://deb.debian.org >/dev/null 2>&1 && return 0
   fi
   if command -v ping >/dev/null 2>&1; then
-    ping -c 1 -W 3 deb.debian.org >/dev/null 2>&1 && return 0
+    ping -c 1 -W 3 1.1.1.1 >/dev/null 2>&1 && return 0
   fi
   getent hosts deb.debian.org >/dev/null 2>&1
 }
@@ -99,7 +155,7 @@ copy_dir_contents() {
 replace_user_home_placeholder() {
   local file="$1"
   [[ -f "$file" ]] || return 0
-  sed -i "s#@USER_HOME@#$USER_HOME#g" "$file"
+  sed -i "s#file://@/#file://$USER_HOME/#g" "$file"
 }
 
 backup_item() {

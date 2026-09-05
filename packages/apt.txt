@@ -1,36 +1,29 @@
-# Base bspwm environment
+# Entorno base BSPWM
 bspwm
 sxhkd
 polybar
-rofi
 picom
+rofi
 kitty
 feh
 zsh
 xsettingsd
 lxappearance
 
-# X11, compositor and input helpers
-x11-xserver-utils
-x11-utils
-x11-xkb-utils
-xserver-xorg-input-synaptics
-suckless-tools
-brightnessctl
+# Notificaciones y OSD
+dunst
+libnotify-bin
 
-# Audio, screenshots, files and UI helpers
+# Control de hardware y multimedia
 pamixer
+brightnessctl
 pavucontrol
-pulseaudio-utils
 pipewire
 flameshot
-caja
-i3lock
-blueman
-network-manager
-net-tools
+i3lock-fancy
+mate-power-manager
 
-# Shell quality-of-life tools used by .zshrc
+# Utilidades de shell y productividad
 bat
 lsd
 xclip
@@ -38,24 +31,21 @@ fzf
 zsh-autosuggestions
 zsh-syntax-highlighting
 
-# Additional personalization captured from this system
-neovim
-htop
-geany
-pluma
-vlc
-
-# Fonts and themes detected on the current system
+# X11, touchpad y fuentes base
+x11-xserver-utils
+x11-utils
+x11-xkb-utils
+suckless-tools
+xserver-xorg-input-synaptics
 fontconfig
 fonts-cantarell
 fonts-font-awesome
 fonts-noto-color-emoji
-parrot-themes
-echo-themes
 bibata-cursor-theme
 breeze-cursor-theme
 
-# Install helpers
+# Dependencias de instalación
 git
 curl
 unzip
+build-essential

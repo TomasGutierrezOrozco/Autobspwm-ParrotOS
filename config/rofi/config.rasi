@@ -1,1 +1,7 @@
+configuration {
+    modi: "drun,run";
+    show-icons: true;
+    drun-display-format: "{name}";
+}
+
 @theme "~/.config/rofi/themes/rounded-nord-dark.rasi"

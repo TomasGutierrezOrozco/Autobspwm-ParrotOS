@@ -1,0 +1,75 @@
+[global]
+    # Fuente
+    font = Hack Nerd Font 11
+
+    # Formato del texto
+    format = "<b>%s</b>\n%b"
+    markup = full
+
+    # Geometría y posición (esquina superior derecha, debajo de la Polybar)
+    origin = top-right
+    offset = (20, 65)
+    width = (280, 380)
+    height = (0, 120)
+    notification_limit = 3
+
+    # Bordes y esquinas redondeadas
+    corner_radius = 12
+    frame_width = 2
+    frame_color = "#88C0D0"
+    separator_color = frame
+
+    # Barras de progreso integradas (para volumen y brillo)
+    progress_bar = true
+    progress_bar_height = 8
+    progress_bar_frame_width = 1
+    progress_bar_min_width = 180
+    progress_bar_max_width = 320
+    progress_bar_corner_radius = 4
+    highlight = "#88C0D0"
+
+    # Espaciado interno
+    padding = 12
+    horizontal_padding = 16
+    text_icon_padding = 14
+
+    # Iconos
+    enable_recursive_icon_lookup = true
+    icon_theme = "Flat-Remix-Green-Dark, Adwaita, hicolor"
+    icon_position = left
+    min_icon_size = 24
+    max_icon_size = 48
+
+    # Comportamiento de pila: una sola notificación que se actualiza
+    stack_duplicates = true
+    hide_duplicate_count = true
+    show_indicators = no
+
+    # Transparencia
+    transparency = 5
+
+    # Tiempos
+    idle_threshold = 120
+
+    # Atajos de ratón
+    mouse_left_click = close_current
+    mouse_middle_click = do_action, close_current
+    mouse_right_click = close_all
+
+[urgency_low]
+    background = "#2E3440"
+    foreground = "#ECEFF4"
+    frame_color = "#4C566A"
+    timeout = 2
+
+[urgency_normal]
+    background = "#2E3440"
+    foreground = "#ECEFF4"
+    frame_color = "#88C0D0"
+    timeout = 3
+
+[urgency_critical]
+    background = "#2E3440"
+    foreground = "#ECEFF4"
+    frame_color = "#BF616A"
+    timeout = 0

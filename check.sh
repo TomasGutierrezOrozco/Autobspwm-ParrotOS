@@ -3,21 +3,25 @@ set -Eeuo pipefail
 
 source "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/lib/common.sh"
 
-WARNINGS=0
 ERRORS=0
+WARNINGS=0
 
-status_ok() { ok "$*"; }
+status_ok() {
+  ok "$*"
+}
+
 status_warn() {
   WARNINGS=$((WARNINGS + 1))
   warn "$*"
 }
+
 status_error() {
   ERRORS=$((ERRORS + 1))
   error "$*"
 }
 
 check_commands() {
-  local commands=(bspwm sxhkd polybar kitty rofi picom feh zsh fc-cache xsettingsd xrdb xsetroot xrandr brightnessctl pamixer pactl flameshot caja)
+  local commands=(bspwm sxhkd polybar kitty rofi picom feh zsh dunst dunstify pamixer brightnessctl flameshot caja)
   for cmd in "${commands[@]}"; do
     if command -v "$cmd" >/dev/null 2>&1; then
       status_ok "Comando disponible: $cmd"
@@ -26,7 +30,7 @@ check_commands() {
     fi
   done
 
-  local optional_commands=(dunst nitrogen xfconf-query synclient i3lock-fancy nvim neofetch htop geany lxterminal xfce4-terminal konsole i3 openbox lxpanel pcmanfm)
+  local optional_commands=(synclient i3lock-fancy nvim lsd batcat fzf xclip)
   for optional in "${optional_commands[@]}"; do
     if command -v "$optional" >/dev/null 2>&1; then
       status_ok "Opcional disponible: $optional"
@@ -38,50 +42,49 @@ check_commands() {
 
 check_packages() {
   local pkg list_file label
-  for list_file in "$PROJECT_DIR/packages/apt.txt" "$PROJECT_DIR/packages/optional.txt"; do
+  for list_file in "$PROJECT_DIR/packages/apt.txt"; do
     [[ -f "$list_file" ]] || continue
-    case "$(basename "$list_file")" in
-      optional.txt) label="opcional" ;;
-      *) label="requerido" ;;
-    esac
-  while IFS= read -r pkg; do
-    [[ -n "$pkg" ]] || continue
-    if dpkg-query -W -f='${Status}' "$pkg" 2>/dev/null | grep -q 'install ok installed'; then
-      status_ok "Paquete $label instalado: $pkg"
-    elif apt-cache show "$pkg" >/dev/null 2>&1; then
-      info "Paquete $label no instalado aquí, disponible para instalar: $pkg"
-    else
-      status_warn "Paquete $label no instalado y no encontrado en caché apt: $pkg"
-    fi
-  done < <(read_package_list "$list_file")
+    label="requerido"
+    while IFS= read -r pkg; do
+      [[ -n "$pkg" ]] || continue
+      if dpkg-query -W -f='${Status}' "$pkg" 2>/dev/null | grep -q "ok installed"; then
+        status_ok "Paquete $label instalado: $pkg"
+      elif apt-cache show "$pkg" >/dev/null 2>&1; then
+        info "Paquete $label no instalado aquí, disponible para instalar: $pkg"
+      else
+        status_error "Paquete $label no disponible en apt: $pkg"
+      fi
+    done < <(read_package_list "$list_file")
   done
 }
 
 check_project_paths() {
   local paths=(
     "$PROJECT_DIR/config/bspwm/bspwmrc"
+    "$PROJECT_DIR/config/bspwm/scripts/bspwm_resize"
+    "$PROJECT_DIR/config/bspwm/scripts/osd.sh"
+    "$PROJECT_DIR/config/bspwm/scripts/vpn_status.sh"
+    "$PROJECT_DIR/config/bspwm/scripts/ethernet_status.sh"
+    "$PROJECT_DIR/config/bspwm/scripts/victim_to_hack.sh"
     "$PROJECT_DIR/config/sxhkd/sxhkdrc"
     "$PROJECT_DIR/config/polybar/current.ini"
+    "$PROJECT_DIR/config/polybar/workspace.ini"
     "$PROJECT_DIR/config/polybar/launch2.sh"
     "$PROJECT_DIR/config/kitty/kitty.conf"
+    "$PROJECT_DIR/config/kitty/color.ini"
     "$PROJECT_DIR/config/rofi/config.rasi"
+    "$PROJECT_DIR/config/rofi/themes/rounded-nord-dark.rasi"
     "$PROJECT_DIR/config/picom/picom.conf"
+    "$PROJECT_DIR/config/dunst/dunstrc"
     "$PROJECT_DIR/config/wallpapers/Fondo6.jpg"
+    "$PROJECT_DIR/config/fonts/HackNerdFont-Regular.ttf"
+    "$PROJECT_DIR/config/fonts/Iosevka Nerd Font Complete.ttf"
     "$PROJECT_DIR/config/zsh/.zshrc"
     "$PROJECT_DIR/config/zsh/.p10k.zsh"
-    "$PROJECT_DIR/config/nvim/init.lua"
-    "$PROJECT_DIR/config/nvim/lua/chadrc.lua"
-    "$PROJECT_DIR/config/neofetch/config.conf"
-    "$PROJECT_DIR/config/htop/htoprc"
-    "$PROJECT_DIR/config/geany/geany.conf"
-    "$PROJECT_DIR/config/local-share/konsole/Parrot.profile"
-    "$PROJECT_DIR/config/editors/vscode/User/settings.json"
-    "$PROJECT_DIR/config/i3/config"
-    "$PROJECT_DIR/config/openbox/lxde-rc.xml"
-    "$PROJECT_DIR/config/lxpanel/LXDE/panels/panel"
-    "$PROJECT_DIR/config/pcmanfm/LXDE/pcmanfm.conf"
-    "$PROJECT_DIR/config/mate/panel2.d/default/launchers/kitty.desktop"
-    "$PROJECT_DIR/config/lxqt/lxqt.conf"
+    "$PROJECT_DIR/config/zsh/.p10k-root.zsh"
+    "$PROJECT_DIR/config/home/.Xresources"
+    "$PROJECT_DIR/config/home/.gtkrc-2.0"
+    "$PROJECT_DIR/config/home/.fehbg"
   )
   for path in "${paths[@]}"; do
     if [[ -e "$path" ]]; then
@@ -94,13 +97,17 @@ check_project_paths() {
 
 check_executables() {
   local scripts=(
-    "$PROJECT_DIR/autobspwm"
     "$PROJECT_DIR/install.sh"
     "$PROJECT_DIR/backup.sh"
     "$PROJECT_DIR/restore.sh"
     "$PROJECT_DIR/uninstall.sh"
     "$PROJECT_DIR/check.sh"
     "$PROJECT_DIR/config/bspwm/bspwmrc"
+    "$PROJECT_DIR/config/bspwm/scripts/bspwm_resize"
+    "$PROJECT_DIR/config/bspwm/scripts/osd.sh"
+    "$PROJECT_DIR/config/bspwm/scripts/vpn_status.sh"
+    "$PROJECT_DIR/config/bspwm/scripts/ethernet_status.sh"
+    "$PROJECT_DIR/config/bspwm/scripts/victim_to_hack.sh"
     "$PROJECT_DIR/config/polybar/launch.sh"
     "$PROJECT_DIR/config/polybar/launch2.sh"
     "$PROJECT_DIR/config/scripts/local-bin/toggle-touchpad-synclient"
@@ -126,8 +133,7 @@ check_forbidden_runtime_refs() {
 }
 
 main() {
-  require_user_context
-  info "Comprobando proyecto autobspwm-parrot"
+  info "Comprobando proyecto Autobspwm-ParrotOS..."
   check_project_paths
   check_executables
   check_commands
@@ -135,7 +141,7 @@ main() {
   check_forbidden_runtime_refs
 
   info "Resumen: $ERRORS error(es), $WARNINGS warning(s)"
-  ((ERRORS == 0)) || exit 1
+  [[ "$ERRORS" -eq 0 ]] || exit 1
 }
 
 main "$@"

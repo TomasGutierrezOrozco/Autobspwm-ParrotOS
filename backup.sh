@@ -10,6 +10,7 @@ $USER_HOME/.config/sxhkd
 $USER_HOME/.config/polybar
 $USER_HOME/.config/kitty
 $USER_HOME/.config/picom
+$USER_HOME/.config/dunst
 $USER_HOME/.config/rofi
 $USER_HOME/.config/gtk-2.0
 $USER_HOME/.config/gtk-3.0

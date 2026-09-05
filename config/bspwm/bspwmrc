@@ -3,11 +3,21 @@
 # Lanzar sxhkd si no está corriendo
 pgrep -x sxhkd > /dev/null || sxhkd &
 
-# Escritorios
-bspc monitor -d I II III IV V VI VII VIII IX X
+# Layout de monitores: extendido por defecto si hay pantalla externa
+[ -x "$HOME/.config/bspwm/scripts/monitor_layout.sh" ] && "$HOME/.config/bspwm/scripts/monitor_layout.sh" extend
 
-# Layout de monitores: extendido a la izquierda por defecto
-# "$HOME/.config/bspwm/scripts/monitor_layout.sh" extend
+# Obtener nombres de los monitores de forma dinámica
+INTERNAL=$(xrandr 2>/dev/null | awk '/ connected primary/{print $1; exit}')
+[ -z "$INTERNAL" ] && INTERNAL=$(xrandr 2>/dev/null | awk '/ connected/{print $1; exit}')
+EXTERNAL=$(xrandr 2>/dev/null | awk '/ connected/{print $1}' | grep -v "$INTERNAL" | head -n1)
+
+# Escritorios dinámicos
+if [ -n "$EXTERNAL" ] && [ -n "$INTERNAL" ]; then
+    bspc monitor "$EXTERNAL" -d I II III IV V
+    bspc monitor "$INTERNAL" -d VI VII VIII IX X
+else
+    bspc monitor "${INTERNAL:-$(bspc query -M 2>/dev/null | head -n1)}" -d I II III IV V VI VII VIII IX X
+fi
 
 # Configuración básica de bspwm
 bspc config border_width         2
@@ -38,8 +48,19 @@ xsetroot -cursor_name left_ptr
 # Polybar
 "$HOME/.config/polybar/launch2.sh" &
 
-# Compositor
+# Compositor (con reinicio limpio)
+killall -q picom
+while pgrep -u $UID -x picom >/dev/null; do sleep 0.1; done
 picom &
+
+# Gestor de energía para portátil
+pgrep -f mate-power-manager >/dev/null || mate-power-manager &
+
+# Demonio de notificaciones (Dunst prioritario sobre MATE)
+if command -v dunst >/dev/null 2>&1; then
+    killall -9 mate-notification-daemon 2>/dev/null
+    systemctl --user restart dunst.service 2>/dev/null || { killall -q dunst; dunst & }
+fi
 
 # Borde a 0 (si no quieres bordes en ventanas)
 bspc config border_width 0
@@ -57,6 +78,5 @@ bspc config border_width 0
     fi
 ) &
 
-
-# Fix para algunas apps Java
-wmname LG3D &
+# Fix para aplicaciones Java
+command -v wmname >/dev/null 2>&1 && wmname LG3D &

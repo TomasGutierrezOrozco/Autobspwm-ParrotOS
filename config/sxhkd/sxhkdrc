@@ -4,11 +4,11 @@
 
 # terminal emulator
 super + Return
-	kitty
+	/opt/kitty/bin/kitty
 
 # program launcher
 super + d
-	rofi -show run
+	/usr/bin/rofi -show drun
 
 # make sxhkd reload its configuration files:
 super + Escape
@@ -117,61 +117,74 @@ super + ctrl + shift + {Left,Down,Up,Right}
 super + alt + {Left,Down,Up,Right}
 	$HOME/.config/bspwm/scripts/bspwm_resize {west,south,north,east}
 
+# Open zen
+super + shift + z
+  $HOME/zen/zen
+
 # Open firefox
 super + shift + f
-  firefox
+  /usr/bin/firefox
+
+# Open Minecraft Launcher
+super + shift + m
+  $HOME/.local/bin/minecraft-launcher-official
 
 # Screenshots
-super + shift + s
-  flameshot gui
+super + alt + s
+  /usr/bin/flameshot gui
 
 # Caja
 super + e
-  caja
+  /usr/bin/caja
 
 # Cambiar entre touchpad activo o no
 super + alt + t
-  $HOME/.local/bin/toggle-touchpad-synclient
+  ~/.local/bin/toggle-touchpad-synclient
 
 
-##### VOLUMEN (PulseAudio/PipeWire via pamixer/pactl)
+##### VOLUMEN (PulseAudio/PipeWire via pamixer/pactl con OSD)
 # Subir volumen 5%
 XF86AudioRaiseVolume
-    pamixer --unmute --increase 5
+    ~/.config/bspwm/scripts/osd.sh vol_up
 
 # Bajar volumen 5%
 XF86AudioLowerVolume
-    pamixer --decrease 5
+    ~/.config/bspwm/scripts/osd.sh vol_down
 
 # Mute/unmute salida
 XF86AudioMute
-    pamixer --toggle-mute
+    ~/.config/bspwm/scripts/osd.sh vol_mute
 
-##### BRILLO (brightnessctl)
+##### BRILLO (brightnessctl con OSD)
 # Subir brillo 5%
 XF86MonBrightnessUp
-    brightnessctl set +5%
+    ~/.config/bspwm/scripts/osd.sh bright_up
 
 # Bajar brillo 5%
 XF86MonBrightnessDown
-    brightnessctl set 5%-
+    ~/.config/bspwm/scripts/osd.sh bright_down
 
 # i3lock-fancy
 super + shift + x
-  i3lock-fancy
+  /usr/bin/i3lock-fancy
 
 # Extender monitor a la izquierda
 super + alt + e
-    $HOME/.config/bspwm/scripts/monitor_layout.sh extend
+    ~/.config/bspwm/scripts/monitor_layout.sh extend
 
 # Duplicar pantallas (resolución limpia, misma en ambos)
 super + alt + m
-    $HOME/.config/bspwm/scripts/monitor_layout.sh mirror
+    ~/.config/bspwm/scripts/monitor_layout.sh mirror
 
 # Duplicar manteniendo 1920x1200 en el portátil y escalando el externo
 super + alt + shift + m
-    $HOME/.config/bspwm/scripts/monitor_layout.sh mirror_scaled
+    ~/.config/bspwm/scripts/monitor_layout.sh mirror_scaled
 
 # Solo monitor interno
 super + alt + i
-    $HOME/.config/bspwm/scripts/monitor_layout.sh internal
+    ~/.config/bspwm/scripts/monitor_layout.sh internal
+
+
+# Stremio
+super + shift + alt + s
+  flatpak run com.stremio.Stremio

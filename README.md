@@ -20,14 +20,20 @@ Layout tiling de `bspwm` con varias ventanas de kitty:
 
 ## Características
 
-- Instala y configura `bspwm`, `sxhkd`, `polybar`, `kitty`, `rofi`, `picom`, GTK, iconos, cursor, fuentes y wallpapers.
-- Copia configuraciones personales de terminal, shell y aplicaciones de personalización.
-- Crea backups automáticos antes de sobrescribir archivos.
-- Permite restaurar backups previos.
-- Permite desinstalar la configuración instalada sin borrar datos personales.
-- Incluye un comando `check` para validar rutas, permisos, comandos, paquetes y referencias inseguras.
-- Excluye explícitamente credenciales, secretos, montajes, servicios externos y rutas sensibles.
-- Soporta instalación mínima del entorno principal o instalación extendida con paquetes opcionales.
+- **Instalador Interactivo:** Menú con banners en color, confirmaciones paso a paso y opción de instalación desatendida (`-y`).
+- **Gestión de Ventanas y Atajos:** `bspwm` y `sxhkd` con atajos multimedia, capturas con Flameshot (`Print` y `Super + Alt + s`) y redimensionamiento dinámico.
+- **Barra de Estado:** `polybar` con arquitectura modular de 8 islas (escritorios interactivos, fecha, VPN dinámico, target, ethernet y control de energía).
+- **Detección Dinámica de VPN:** Soporta interfaces `tun0` (HTB/THM), `tailscale0` y `wg0` de forma automática.
+- **Notificaciones y OSD:** `dunst` y `dunstify` con tema Nord, esquinas redondeadas y barras de progreso fluidas para volumen y brillo.
+- **Compositor Optimizado:** `picom` con esquinas redondeadas (20px), desenfoque `dual_kawase`, sincronización vertical (`vsync = true`) y seguimiento de daños (`use-damage = true`) para máximo rendimiento y ahorro de batería.
+- **Lanzador Moderno:** `rofi` en modo `drun` con iconos y tema `rounded-nord-dark.rasi`.
+- **Terminal & Editor:** `kitty` con paleta Tokyo Night, pestañas powerline y `neovim` configurado.
+- **Shell Profesional:** `zsh` + `powerlevel10k` + plugins (`autosuggestions`, `syntax-highlighting`, `sudo`) + utilidades (`lsd`, `batcat`, `fzf`).
+- **Funciones de Pentesting Integradas:** `extractPorts`, `mkt`, `settarget`, `cleartarget` y `ClearCache`.
+- **Paridad con Usuario Root:** Sincronización de Zsh, Neovim, Kitty y prompt de Powerlevel10k con el distintivo icono de la llama (`󰈸`).
+- **Tipografías Incluidas:** Familia completa de `Hack Nerd Font`, `Iosevka Nerd Font`, `Hurmit Nerd Font`, `Helvetica` y `Feather`.
+- **Copia de Seguridad y Restauración:** `backup.sh` automático antes de sobrescribir archivos, `restore.sh` y `uninstall.sh`.
+- **Validador de Integridad:** `check.sh` para verificar comandos, paquetes, rutas y asegurar cero fugas de datos confidenciales.
 
 ## Estado Del Proyecto
 
