@@ -65,7 +65,7 @@ sanitize_text_file() {
   local file="$1"
   [[ -f "$file" ]] || return 0
   grep -Iq . "$file" || return 0
-  perl -ni -e 'print unless /network\s+storage|remote\s+storage|remote\s+mount|file\s+server|fstab|systemd\s+(?:mount|automount)|automount|\/s[r]v\/|\/m[n]t\/|\.smb|credential|credencial|tailscale|mount-/i' "$file"
+  perl -ni -e 'print unless /network\s+storage|remote\s+storage|remote\s+mount|file\s+server|fstab|systemd\s+(?:mount|automount)|automount|\/s[r]v\/|\/m[n]t\/|\.smb|credential|credencial|mount-/i' "$file"
 }
 
 sanitize_backup_copy() {
@@ -90,7 +90,7 @@ main() {
   while IFS= read -r target; do
     [[ -n "$target" ]] || continue
     case "$target" in
-      *network-storage*|*remote-storage*|*remote-mount*|*file-server*|*fstab*|*.smb*|*/m[n]t/*|*/s[r]v/*|*tailscale*)
+      *network-storage*|*remote-storage*|*remote-mount*|*file-server*|*fstab*|*.smb*|*/m[n]t/*|*/s[r]v/*)
         warn "Excluido por política: $target"
         continue
         ;;

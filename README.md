@@ -1,1024 +1,294 @@
-# autobspwm-parrot
+# Autobspwm-ParrotOS 🦅🔥
 
-`autobspwm-parrot` es un proyecto de automatización para replicar un entorno personalizado de Parrot OS basado en `bspwm`.
+[![Platform](https://img.shields.io/badge/Platform-Parrot%20Security%20OS%20%7C%20Kali%20Linux-blue?style=for-the-badge&logo=linux)](https://parrotsec.org/)
+[![Window Manager](https://img.shields.io/badge/WM-BSPWM%200.9.10-green?style=for-the-badge&logo=archlinux)](https://github.com/baskerville/bspwm)
+[![Shell](https://img.shields.io/badge/Shell-Zsh%20%2B%20Powerlevel10k-orange?style=for-the-badge&logo=gnubash)](https://github.com/romkatv/powerlevel10k)
+[![Editor](https://img.shields.io/badge/Editor-Neovim%20%28NvChad%29-brightgreen?style=for-the-badge&logo=neovim)](https://neovim.io/)
+[![Status Bar](https://img.shields.io/badge/Bar-Polybar%20%288%20Islands%29-purple?style=for-the-badge)](https://github.com/polybar/polybar)
+[![License](https://img.shields.io/badge/License-Custom%20Non--Commercial-red?style=for-the-badge)](LICENSE)
 
-El repositorio contiene configuraciones, scripts, assets, listas de paquetes y utilidades de backup/restore para instalar el entorno en un Parrot OS limpio de forma reproducible, segura e idempotente.
+Instalador automatizado e interactivo para desplegar un entorno de trabajo profesional, minimalista y de alto rendimiento basado en **BSPWM** sobre **Parrot Security OS** y **Kali Linux**, con soporte planificado para Arch Linux.
 
-## Capturas
-
-Vista general del escritorio con wallpaper, polybar y módulos de estado:
-
-![Vista general del escritorio](assets/screenshots/desktop-overview.png)
-
-Kitty con transparencia, blur de fondo, prompt Powerlevel10k y bordes redondeados:
-
-![Kitty con una ventana](assets/screenshots/kitty-single-window.png)
-
-Layout tiling de `bspwm` con varias ventanas de kitty:
-
-![Layout tiling de bspwm](assets/screenshots/bspwm-tiling-layout.png)
-
-## Características
-
-- **Instalador Interactivo:** Menú con banners en color, confirmaciones paso a paso y opción de instalación desatendida (`-y`).
-- **Gestión de Ventanas y Atajos:** `bspwm` y `sxhkd` con atajos multimedia, capturas con Flameshot (`Print` y `Super + Alt + s`) y redimensionamiento dinámico.
-- **Barra de Estado:** `polybar` con arquitectura modular de 8 islas (escritorios interactivos, fecha, VPN dinámico, target, ethernet y control de energía).
-- **Detección Dinámica de VPN:** Soporta interfaces `tun0` (HTB/THM), `tailscale0` y `wg0` de forma automática.
-- **Notificaciones y OSD:** `dunst` y `dunstify` con tema Nord, esquinas redondeadas y barras de progreso fluidas para volumen y brillo.
-- **Compositor Optimizado:** `picom` con esquinas redondeadas (20px), desenfoque `dual_kawase`, sincronización vertical (`vsync = true`) y seguimiento de daños (`use-damage = true`) para máximo rendimiento y ahorro de batería.
-- **Lanzador Moderno:** `rofi` en modo `drun` con iconos y tema `rounded-nord-dark.rasi`.
-- **Terminal & Editor:** `kitty` con paleta Tokyo Night, pestañas powerline y `neovim` configurado.
-- **Shell Profesional:** `zsh` + `powerlevel10k` + plugins (`autosuggestions`, `syntax-highlighting`, `sudo`) + utilidades (`lsd`, `batcat`, `fzf`).
-- **Funciones de Pentesting Integradas:** `extractPorts`, `mkt`, `settarget`, `cleartarget` y `ClearCache`.
-- **Paridad con Usuario Root:** Sincronización de Zsh, Neovim, Kitty y prompt de Powerlevel10k con el distintivo icono de la llama (`󰈸`).
-- **Tipografías Incluidas:** Familia completa de `Hack Nerd Font`, `Iosevka Nerd Font`, `Hurmit Nerd Font`, `Helvetica` y `Feather`.
-- **Copia de Seguridad y Restauración:** `backup.sh` automático antes de sobrescribir archivos, `restore.sh` y `uninstall.sh`.
-- **Validador de Integridad:** `check.sh` para verificar comandos, paquetes, rutas y asegurar cero fugas de datos confidenciales.
-
-## Estado Del Proyecto
-
-El proyecto fue generado desde un sistema Parrot OS personalizado y saneado para uso portable.
-
-No incluye secretos, claves privadas, credenciales ni configuraciones de acceso a servicios externos.
-
-## Requisitos
-
-Sistema recomendado:
-
-- Parrot OS o distribución Debian-based.
-- Sesión X11.
-- Usuario normal con permisos `sudo`.
-- Conexión a internet para `apt update`, instalación de paquetes y clonado opcional de Powerlevel10k.
-- Bash disponible.
-
-No ejecutes el instalador como `root`. El script instalará paquetes con `sudo` cuando sea necesario, pero las configuraciones se aplican al usuario actual.
-
-## Instalación Del Repositorio
-
-Clona o copia el proyecto en el sistema destino:
-
-```bash
-git clone https://github.com/TomasGutierrezOrozco/Autobspwm-ParrotOS.git
-cd autobspwm-parrot
-```
-
-Si ya tienes la carpeta copiada manualmente:
-
-```bash
-cd ~/autobspwm-parrot
-```
-
-Da permisos de ejecución si fuese necesario:
-
-```bash
-chmod +x autobspwm install.sh backup.sh restore.sh uninstall.sh check.sh
-```
-
-## Uso Rápido
-
-Validar el proyecto:
-
-```bash
-./autobspwm check
-```
-
-Crear backup manual:
-
-```bash
-./autobspwm backup
-```
-
-Instalar entorno principal:
-
-```bash
-./autobspwm install
-```
-
-Instalar entorno principal y paquetes secundarios opcionales:
-
-```bash
-./autobspwm install --with-optional
-```
-
-Restaurar último backup:
-
-```bash
-./autobspwm restore
-```
-
-Desinstalar configuración:
-
-```bash
-./autobspwm uninstall
-```
-
-## Comando Principal
-
-El punto de entrada es:
-
-```bash
-./autobspwm <comando> [opciones]
-```
-
-Comandos disponibles:
-
-| Comando | Descripción |
-| --- | --- |
-| `install` | Instala paquetes requeridos, crea backup y copia configuraciones. |
-| `backup` | Crea un backup timestamped de las configuraciones soportadas. |
-| `restore` | Restaura el último backup o uno específico. |
-| `uninstall` | Retira configuraciones instaladas y ofrece restaurar backup. |
-| `check` | Valida estado del proyecto, comandos, paquetes y seguridad. |
-| `help` | Muestra ayuda básica. |
-
-## Parámetros Y Variables
-
-### `install`
-
-Instalación estándar:
-
-```bash
-./autobspwm install
-```
-
-Instalación con paquetes opcionales:
-
-```bash
-./autobspwm install --with-optional
-```
-
-Equivalente usando variable de entorno:
-
-```bash
-INSTALL_OPTIONAL=1 ./autobspwm install
-```
-
-La instalación estándar usa:
-
-```bash
-packages/apt.txt
-```
-
-La instalación extendida añade:
-
-```bash
-packages/optional.txt
-```
-
-### `backup`
-
-Crear backup:
-
-```bash
-./autobspwm backup
-```
-
-Ruta generada:
-
-```bash
-~/.backup-autobspwm/YYYY-MM-DD_HH-MM-SS/
-```
-
-### `restore`
-
-Restaurar último backup:
-
-```bash
-./autobspwm restore
-```
-
-Restaurar backup específico:
-
-```bash
-./autobspwm restore 2026-04-28_13-30-00
-```
-
-Antes de restaurar, el script muestra las rutas afectadas y solicita confirmación.
-
-### `uninstall`
-
-Desinstalar configuración instalada:
-
-```bash
-./autobspwm uninstall
-```
-
-El uninstall:
-
-- mueve configuraciones instaladas a `~/.backup-autobspwm/uninstall_YYYY-MM-DD_HH-MM-SS/`.
-- ofrece restaurar el último backup.
-- pregunta explícitamente antes de eliminar paquetes apt.
-- no borra datos personales.
-
-### `check`
-
-Validar proyecto:
-
-```bash
-./autobspwm check
-```
-
-El check valida:
-
-- rutas esperadas dentro del proyecto.
-- permisos ejecutables.
-- comandos principales del entorno.
-- comandos opcionales si existen.
-- paquetes requeridos y opcionales.
-- referencias no portables o excluidas en `config/` y `system/`.
-
-Los paquetes que no están instalados localmente pero existen en repositorios apt se reportan como `INFO`, no como error. Esto evita falsos positivos cuando el sistema actual tiene binarios instalados en `/opt` o `/usr/local`.
-
-## Estructura Del Proyecto
-
-```text
-autobspwm-parrot/
-├── autobspwm
-├── install.sh
-├── backup.sh
-├── restore.sh
-├── uninstall.sh
-├── check.sh
-├── README.md
-├── lib/
-│   └── common.sh
-├── packages/
-│   ├── apt.txt
-│   ├── optional.txt
-│   ├── pip.txt
-│   └── manual.txt
-├── config/
-│   ├── bspwm/
-│   ├── sxhkd/
-│   ├── polybar/
-│   ├── kitty/
-│   ├── rofi/
-│   ├── picom/
-│   ├── gtk-2.0/
-│   ├── gtk-3.0/
-│   ├── gtk-4.0/
-│   ├── zsh/
-│   ├── nvim/
-│   ├── fonts/
-│   ├── wallpapers/
-│   ├── scripts/
-│   └── ...
-├── system/
-│   ├── desktop-files/
-│   ├── services/
-│   └── xsession/
-└── logs/
-```
-
-## Configuraciones Incluidas
-
-Entorno principal:
-
-- `bspwm`: `bspwmrc`, reglas de ventana, arranque de `sxhkd`, `polybar`, `picom`, wallpaper y touchpad.
-- `sxhkd`: atajos de teclado para bspwm, terminal, rofi, volumen, brillo, screenshots, monitor layout y bloqueo.
-- `polybar`: múltiples barras, launchers, powermenu, módulos de red/VPN/target, fuentes y temas internos.
-- `kitty`: configuración, colores, fuente, transparencia y atajos.
-- `rofi`: configuración y temas.
-- `picom`: sombras, blur, opacidad y bordes redondeados.
-- GTK 2/3/4: temas, preferencias, bookmarks saneados.
-- `xsettingsd`: integración visual para apps GTK.
-- `zsh`: `.zshrc`, aliases, funciones, Powerlevel10k y plugins.
-- `Powerlevel10k`: se clona en `~/powerlevel10k` si no existe y hay internet.
-- `wallpapers`: fondos locales usados por el entorno.
-- `fonts`: fuentes locales necesarias para polybar y terminal.
-- `flameshot`: configuración de capturas.
-- `touchpad`: script `toggle-touchpad-synclient`.
-
-Aplicaciones y personalización adicional:
-
-- `nvim`: configuración NvChad, tema `bearded-arc`, plugins declarados y `lazy-lock.json`.
-- `neofetch`: configuración visual.
-- `htop`: layout y preferencias.
-- `geany`: tema, fuentes y preferencias.
-- `lxterminal` y `xfce4-terminal`: configuración capturada.
-- `Konsole`: perfiles y esquema `GreenOnBlack`.
-- `mimeapps.list`: asociaciones de aplicaciones.
-- VS Code/Windsurf: solo `settings.json` y keybindings seguros.
-
-Perfiles secundarios capturados:
-
-- `i3`
-- `openbox`
-- `lxpanel`
-- `pcmanfm`
-- launchers MATE seleccionados
-- apariencia LXQt segura
-
-Estos perfiles secundarios se copian como configuración, pero sus paquetes se instalan solo si usas `--with-optional`.
-
-## Paquetes
-
-Paquetes requeridos:
-
-```bash
-packages/apt.txt
-```
-
-Paquetes opcionales para perfiles secundarios:
-
-```bash
-packages/optional.txt
-```
-
-Paquetes pip:
-
-```bash
-packages/pip.txt
-```
-
-Actualmente no hay paquetes pip requeridos.
-
-Elementos manuales:
-
-```bash
-packages/manual.txt
-```
-
-## Flujo Recomendado En Parrot Limpio
-
-1. Instala Parrot OS.
-
-2. Actualiza el sistema base si lo deseas:
-
-```bash
-sudo apt update
-sudo apt upgrade
-```
-
-3. Clona el repositorio:
-
-```bash
-git clone https://github.com/TomasGutierrezOrozco/Autobspwm-ParrotOS.git
-cd autobspwm-parrot
-```
-
-4. Ejecuta el check inicial:
-
-```bash
-./autobspwm check
-```
-
-5. Instala el entorno principal:
-
-```bash
-./autobspwm install
-```
-
-6. Opcionalmente instala perfiles secundarios:
-
-```bash
-./autobspwm install --with-optional
-```
-
-7. Cierra sesión.
-
-8. En el login manager selecciona:
-
-```text
-bspwm autobspwm
-```
-
-9. Inicia sesión y valida:
-
-```bash
-./autobspwm check
-```
-
-## Backups
-
-El instalador ejecuta backup automáticamente antes de sobrescribir configuraciones.
-
-También puedes ejecutar backup manual:
-
-```bash
-./autobspwm backup
-```
-
-Los backups se guardan en:
-
-```bash
-~/.backup-autobspwm/YYYY-MM-DD_HH-MM-SS/
-```
-
-El backup cubre configuraciones de entorno gráfico, shell, terminales y apps de personalización soportadas.
-
-No respalda secretos, tokens, claves privadas, configuraciones de acceso externo ni almacenamiento remoto.
-
-## Restauración
-
-Restaurar último backup:
-
-```bash
-./autobspwm restore
-```
-
-Restaurar uno específico:
-
-```bash
-./autobspwm restore YYYY-MM-DD_HH-MM-SS
-```
-
-El script solicita confirmación antes de restaurar.
-
-## Desinstalación
-
-```bash
-./autobspwm uninstall
-```
-
-La desinstalación:
-
-- mueve configuraciones instaladas a un backup de uninstall.
-- ofrece restaurar el último backup disponible.
-- pregunta antes de eliminar paquetes.
-- no toca datos personales no gestionados por este proyecto.
-
-## Monitores
-
-El script de layout está en:
-
-```bash
-config/bspwm/scripts/monitor_layout.sh
-```
-
-Usa `xrandr` para detectar monitor interno y externo.
-
-Atajos definidos:
-
-| Atajo | Acción |
-| --- | --- |
-| `Super + Alt + e` | Extender monitor externo a la izquierda. |
-| `Super + Alt + m` | Duplicar pantallas. |
-| `Super + Alt + Shift + m` | Duplicar con escalado. |
-| `Super + Alt + i` | Usar solo monitor interno. |
-
-Si tu hardware usa resoluciones diferentes, ajusta:
-
-```bash
-TARGET_INT_MODE="1920x1200"
-TARGET_EXT_MODE="1920x1080"
-```
-
-## Atajos De Teclado
-
-Los atajos están definidos en:
-
-```bash
-config/sxhkd/sxhkdrc
-```
-
-### Aplicaciones Y Control General
-
-| Atajo | Acción |
-| --- | --- |
-| `Super + Enter` | Abre `kitty`. |
-| `Super + d` | Abre `rofi -show run`. |
-| `Super + Escape` | Recarga la configuración de `sxhkd`. |
-| `Super + Shift + f` | Abre Firefox. |
-| `Super + Shift + s` | Abre `flameshot gui` para capturas. |
-| `Super + e` | Abre Caja. |
-| `Super + Alt + t` | Alterna el touchpad usando `toggle-touchpad-synclient`. |
-| `Super + Shift + x` | Bloquea sesión con `i3lock-fancy`. |
-
-### Control De bspwm
-
-| Atajo | Acción |
-| --- | --- |
-| `Super + Shift + q` | Cierra `bspwm`. |
-| `Super + Shift + r` | Reinicia `bspwm`. |
-| `Super + q` | Cierra la ventana enfocada. |
-| `Super + Shift + q` | Mata la ventana enfocada. |
-| `Super + m` | Alterna entre layout tiled y monocle. |
-| `Super + y` | Envía el nodo marcado más reciente al nodo preseleccionado más reciente. |
-| `Super + g` | Intercambia la ventana actual con la ventana más grande. |
-
-Nota: `Super + Shift + q` está definido tanto para `bspc quit` como para matar ventana por la expansión de llaves de `sxhkd`. Si notas comportamiento ambiguo, conviene separar esos binds.
-
-### Estados Y Flags De Ventana
-
-| Atajo | Acción |
-| --- | --- |
-| `Super + t` | Cambia la ventana a tiled. |
-| `Super + Shift + t` | Cambia la ventana a pseudo tiled. |
-| `Super + s` | Cambia la ventana a floating. |
-| `Super + f` | Cambia la ventana a fullscreen. |
-| `Super + Ctrl + m` | Alterna flag marked. |
-| `Super + Ctrl + x` | Alterna flag locked. |
-| `Super + Ctrl + y` | Alterna flag sticky. |
-| `Super + Ctrl + z` | Alterna flag private. |
-
-### Foco, Swap Y Escritorios
-
-| Atajo | Acción |
-| --- | --- |
-| `Super + Left/Down/Up/Right` | Enfoca ventana hacia izquierda/abajo/arriba/derecha. |
-| `Super + Shift + Left/Down/Up/Right` | Intercambia ventana hacia izquierda/abajo/arriba/derecha. |
-| `Super + p` | Enfoca el nodo padre. |
-| `Super + b` | Enfoca el nodo hermano. |
-| `Super + comma` | Enfoca el primer nodo. |
-| `Super + period` | Enfoca el segundo nodo. |
-| `Super + c` | Enfoca la siguiente ventana del escritorio actual. |
-| `Super + Shift + c` | Enfoca la ventana anterior del escritorio actual. |
-| `Super + bracketleft` | Enfoca el escritorio anterior del monitor actual. |
-| `Super + bracketright` | Enfoca el escritorio siguiente del monitor actual. |
-| `Super + grave` | Enfoca el último nodo. |
-| `Super + Tab` | Enfoca el último escritorio. |
-| `Super + o` | Enfoca el nodo anterior en el historial de foco. |
-| `Super + i` | Enfoca el nodo siguiente en el historial de foco. |
-| `Super + 1-9,0` | Cambia al escritorio 1-10. |
-| `Super + Shift + 1-9,0` | Envía la ventana actual al escritorio 1-10. |
-
-### Preselección
-
-| Atajo | Acción |
-| --- | --- |
-| `Super + Ctrl + Alt + Left/Down/Up/Right` | Preselecciona dirección para la próxima ventana. |
-| `Super + Ctrl + 1-9` | Define ratio de preselección `0.1` a `0.9`. |
-| `Super + Ctrl + Alt + Space` | Cancela preselección del nodo enfocado. |
-| `Super + Ctrl + Shift + Space` | Cancela preselección de todo el escritorio actual. |
-
-### Movimiento Y Resize
-
-| Atajo | Acción |
-| --- | --- |
-| `Super + Ctrl + Shift + Left/Down/Up/Right` | Mueve una ventana flotante en pasos de 20 px. |
-| `Super + Alt + Left/Down/Up/Right` | Redimensiona con `bspwm_resize`; usa pasos distintos para ventanas tiled/floating. |
-
-### Audio, Brillo Y Monitores
-
-| Atajo | Acción |
-| --- | --- |
-| `XF86AudioRaiseVolume` | Sube volumen 5% y desmutea. |
-| `XF86AudioLowerVolume` | Baja volumen 5%. |
-| `XF86AudioMute` | Alterna mute. |
-| `XF86MonBrightnessUp` | Sube brillo 5%. |
-| `XF86MonBrightnessDown` | Baja brillo 5%. |
-| `Super + Alt + e` | Extiende monitor externo a la izquierda. |
-| `Super + Alt + m` | Duplica pantallas. |
-| `Super + Alt + Shift + m` | Duplica pantallas con escalado. |
-| `Super + Alt + i` | Usa solo monitor interno. |
-
-## Seguridad Y Exclusiones
-
-Este proyecto excluye explícitamente:
-
-- credenciales, secretos, tokens y claves privadas.
-- configuraciones de acceso a servicios externos.
-- configuraciones de almacenamiento remoto o montajes persistentes.
-- archivos de identidad, password stores y llaveros personales.
-- historiales, cachés, `globalStorage` y estados internos de editores.
-- repositorios internos de configuración, como `.git` dentro de configs copiadas.
-- autostarts de servicios externos o compartición de archivos.
-- paneles o atajos de escritorio relacionados con montajes.
-
-Las integraciones locales no portables fueron retiradas de las configuraciones incluidas.
-
-## Idempotencia
-
-El instalador está diseñado para ejecutarse más de una vez:
-
-- crea backup antes de copiar.
-- copia configuraciones sobre rutas esperadas.
-- mantiene fuentes en `~/.local/share/fonts/autobspwm`.
-- conserva backups previos.
-- no elimina paquetes sin confirmación.
-
-## Logs
-
-Los logs se generan en:
-
-```bash
-logs/autobspwm-YYYY-MM-DD_HH-MM-SS.log
-```
-
-Consultar último log:
-
-```bash
-ls -t logs/autobspwm-*.log | head -n 1
-tail -n 120 "$(ls -t logs/autobspwm-*.log | head -n 1)"
-```
-
-## Troubleshooting
-
-### `check` muestra paquetes no instalados como `INFO`
-
-Eso no necesariamente es un problema. Significa que el paquete existe en apt, pero no está instalado en el sistema actual.
-
-Ejemplo: si `kitty` existe en `/opt/kitty/bin/kitty`, el comando puede funcionar aunque dpkg no lo marque como instalado.
-
-### `picom`, `kitty` o `nvim` funcionan pero aparecen como no instalados por paquete
-
-Es normal si fueron instalados manualmente en `/opt` o `/usr/local`. En un Parrot limpio, el instalador intentará instalar los paquetes desde apt.
-
-### No aparece la sesión de bspwm
-
-Verifica que exista:
-
-```bash
-ls /usr/share/xsessions/bspwm-autobspwm.desktop
-```
-
-Si no existe, vuelve a ejecutar:
-
-```bash
-./autobspwm install
-```
-
-### Polybar no se ve correctamente
-
-Revisa fuentes:
-
-```bash
-fc-cache -fv
-fc-match "Iosevka Nerd Font"
-```
-
-Reinicia bspwm:
-
-```bash
-bspc wm -r
-```
-
-### Rofi o GTK no toman el tema
-
-Ejecuta:
-
-```bash
-gsettings get org.gnome.desktop.interface gtk-theme
-gsettings get org.gnome.desktop.interface icon-theme
-```
-
-Si usas XFCE:
-
-```bash
-xfconf-query -c xsettings -p /Net/ThemeName
-```
-
-## Desarrollo
-
-Validar sintaxis Bash:
-
-```bash
-bash -n autobspwm install.sh backup.sh restore.sh uninstall.sh check.sh lib/common.sh
-```
-
-Validar el proyecto:
-
-```bash
-./autobspwm check
-```
-
-Buscar referencias sensibles antes de publicar:
-
-```bash
-rg -n '/home/|credential|token|secret|password|private|key|mount|remote|server' config system
-```
-
-## Licencia
-
-Este proyecto está publicado bajo una licencia no comercial personalizada.
-
-Copyright (c) 2026 TomasGutierrezOrozco.
-
-No está permitido vender, sublicenciar, monetizar, revender, empaquetar como producto de pago ni usar este proyecto o derivados con fines comerciales sin permiso explícito por escrito del autor.
-
-Consulta [LICENSE](LICENSE) para los términos completos.
-
-## Aviso
-
-Revisa siempre `packages/apt.txt`, `packages/optional.txt` y `config/` antes de ejecutar el instalador en un sistema de trabajo. Aunque el proyecto crea backups, modificar configuraciones de escritorio puede afectar la sesión gráfica actual del usuario.
+El proyecto incluye un rice estético moderno (Nord / Tokyo Night), compositor Picom de ultra bajo consumo, barra de estado Polybar en 8 islas modulares, OSD en tiempo real para volumen y brillo, terminal Kitty, utilidades de pentesting integradas y sincronización total de entorno con el usuario **root** (icono de la llama `󰈸`).
 
 ---
 
-# English Documentation
+## 📸 Galería Visual
 
-`Autobspwm-ParrotOS` is an automation project for reproducing a customized Parrot OS desktop environment based on `bspwm`.
+### Vista General del Escritorio (Polybar modular, fondo y escritorios)
+![Vista general del escritorio](assets/screenshots/desktop-overview.png)
 
-The repository contains user configuration files, installation scripts, wallpapers, fonts, package lists, backup utilities and restore/uninstall helpers. It is designed to bootstrap the same visual environment on a clean Parrot OS installation while keeping the process reproducible, safe and idempotent.
+### Terminal Kitty (Tokyo Night, Powerlevel10k, blur dual-kawase y padding)
+![Kitty con una ventana](assets/screenshots/kitty-single-window.png)
 
-## Features
+### Tiling en BSPWM (Gestión dinámica de ventanas y gaps)
+![Layout tiling de bspwm](assets/screenshots/bspwm-tiling-layout.png)
 
-- Installs and configures `bspwm`, `sxhkd`, `polybar`, `kitty`, `rofi`, `picom`, GTK settings, icons, cursor theme, fonts and wallpapers.
-- Copies shell, terminal and application customization files.
-- Creates automatic backups before modifying existing user configuration.
-- Restores previous backups.
-- Removes installed configuration safely through an uninstall workflow.
-- Provides a `check` command to validate paths, permissions, commands, packages and sensitive references.
-- Excludes credentials, secrets, external-service access configuration, persistent mounts and sensitive local state.
-- Supports a standard installation and an extended installation with optional secondary desktop profiles.
+---
 
-## Requirements
+## ✨ Características Principales
 
-Recommended target system:
+- 🚀 **Instalador Interactivo y Autónomo:** Menú con banners ASCII en color, confirmaciones paso a paso, prechequeo de dependencias y opción de instalación desatendida (`-y`).
+- 🪟 **Gestión de Ventanas Avanzada:** `bspwm` y `sxhkd` con atajos ergonómicos, redimensionamiento inteligente (`bspwm_resize`) y reglas para ventanas flotantes.
+- 🏝️ **Polybar en 8 Islas Modulares:**
+  1. *Log / Logo*: Menú interactivo de aplicaciones.
+  2. *Ethernet Status*: Detección automática de la interfaz de red activa (Wi-Fi o cable Ethernet).
+  3. *VPN Status*: Detección dinámica y priorizada para `tun*` (HackTheBox / TryHackMe / OpenVPN), `wg*` (WireGuard) y `tailscale*`.
+  4. *Secondary Bar*: Fecha y hora con formato extendido.
+  5. *Workspaces (Centro)*: Renderizado interactivo de los escritorios virtuales (`I` al `X`).
+  6. *Target Status*: Monitor en vivo para objetivos de pentesting (`settarget` / `cleartarget`).
+  7. *Primary Bar*: Menú de apagado, reinicio, suspensión y bloqueo de sesión.
+- 🔔 **Notificaciones y OSD con Dunst:** Tema Nord integrado, bordes redondeados (12px), anulación de servicios D-Bus para evitar colisiones con MATE y barras de progreso fluidas para el control de volumen y brillo en pantalla.
+- ⚡ **Compositor Picom de Alto Rendimiento:** Desenfoque `dual_kawase`, sombras suaves, esquinas redondeadas (20px), sincronización vertical (`vsync = true`) y seguimiento de daños (`use-damage = true`) para evitar el consumo excesivo de CPU y ahorrar batería en laptops.
+- 🔍 **Lanzador Rofi:** Modo `drun` con iconos y tema moderno `rounded-nord-dark.rasi`.
+- 💻 **Terminal Kitty & Editor Neovim:** Paleta Tokyo Night, pestañas con estilo Powerline y suite Neovim preconfigurada con NvChad.
+- 🐚 **Zsh + Powerlevel10k:** Autocompletado enriquecido con colores, historial persistente, plugins (`autosuggestions`, `syntax-highlighting`, `sudo`) y utilidades CLI modernas (`lsd`, `batcat`, `fzf`, `xclip`).
+- 🎯 **Funciones de Pentesting Integradas en Shell:**
+  - `extractPorts`: Parsea capturas grepeables de Nmap, formatea la salida y copia automáticamente los puertos abiertos al portapapeles.
+  - `settarget` / `cleartarget`: Configura o limpia la IP y nombre del objetivo en Polybar.
+  - `mkt`: Genera en un segundo la estructura estándar de directorios para auditorías (`nmap/`, `content/`, `exploits/`).
+  - `ClearCache`: Script de mantenimiento que limpia cachés de APT, Flatpak, Thumbnails, pip, compilaciones de Go y logs de systemd.
+- 󰈸 **Paridad Completa con Usuario Root:** Sincronización automática de Zsh, Neovim, Kitty y prompt de Powerlevel10k personalizado con el distintivo icono de la llama (`󰈸`).
+- 🔤 **Tipografías Incluidas:** Familia completa de `Hack Nerd Font` (12 variantes), `Iosevka Nerd Font`, `Hurmit Nerd Font Mono`, `Helvetica` y `Feather Icons`.
+- 🛡️ **Seguridad y Respaldo:** Backup automático fechado en `~/.backup-autobspwm/` antes de tocar cualquier archivo, con scripts de restauración (`restore.sh`) y desinstalación limpia (`uninstall.sh`).
 
-- Parrot OS or another Debian-based distribution.
-- X11 session.
-- Regular user with `sudo` privileges.
-- Internet connection for `apt update`, package installation and optional Powerlevel10k cloning.
-- Bash.
+---
 
-Do not run the installer as `root`. The installer uses `sudo` only when system-level package installation is required. User configuration is applied to the current user.
+## 📋 Requisitos del Sistema
 
-## Quick Start
+- **Distribución:** Parrot Security OS 6.x / 7.x, Kali Linux 2024.x / 2025.x (o derivados de Debian).
+- **Servidor Gráfico:** X11.
+- **Usuario:** Usuario normal con privilegios de `sudo`.
+- **Conexión a Internet:** Requerida durante la primera instalación para descargar los paquetes APT y dependencias.
 
-Clone the repository:
+> [!IMPORTANT]
+> Ejecuta el instalador con tu usuario normal. Si requieres permisos administrativos, el script solicitará tu contraseña de `sudo` de forma segura.
+
+---
+
+## 🚀 Instalación Rápida
+
+1. **Clona el repositorio en tu máquina:**
+   ```bash
+   git clone https://github.com/TomasGutierrezOrozco/Autobspwm-ParrotOS.git
+   cd Autobspwm-ParrotOS
+   ```
+
+2. **Ejecuta el instalador:**
+   ```bash
+   ./install.sh
+   ```
+
+3. **(Opcional) Instalación Desatendida:**
+   Si deseas realizar una instalación automática sin preguntas interactivas:
+   ```bash
+   ./install.sh -y
+   ```
+
+4. **Finalizar y Acceder:**
+   Una vez completada la instalación, reinicia tu equipo o cierra sesión:
+   ```bash
+   sudo reboot
+   ```
+   En la pantalla de inicio de sesión (Display Manager), asegúrate de seleccionar **bspwm** en el menú de sesiones.
+
+---
+
+## ⌨️ Guía Completa de Atajos de Teclado
+
+Los atajos están orquestados por `sxhkd` (`~/.config/sxhkd/sxhkdrc`).
+
+### 1. Lanzadores y Aplicaciones
+
+| Atajo | Acción |
+| :--- | :--- |
+| `Super + Enter` | Abre la terminal **Kitty** |
+| `Super + d` | Lanzador de aplicaciones **Rofi** (modo drun) |
+| `Super + Shift + f` | Abre el navegador **Firefox** |
+| `Super + Shift + z` | Abre el navegador **Zen** |
+| `Super + e` | Abre el explorador de archivos **Caja** |
+| `Super + Shift + m` | Abre Minecraft Launcher Oficial |
+| `Super + Shift + x` | Bloquea la pantalla con **i3lock-fancy** |
+| `Super + Alt + s` | Captura de pantalla interactiva con **Flameshot** |
+| `Print` | Captura de pantalla rápida con **Flameshot** |
+| `Super + Escape` | Recarga en caliente la configuración de `sxhkd` |
+
+### 2. Control de Ventanas y Layout en BSPWM
+
+| Atajo | Acción |
+| :--- | :--- |
+| `Super + q` | Cierra la ventana enfocada |
+| `Super + Shift + q` | Mata (force-kill) la ventana enfocada |
+| `Super + Shift + r` | Reinicia y recarga `bspwm` en caliente |
+| `Super + m` | Alterna entre layout tiled (mosaico) y monocle (pantalla completa) |
+| `Super + t` | Establece el estado de la ventana en **Tiled** |
+| `Super + Shift + t` | Establece el estado en **Pseudo-tiled** |
+| `Super + s` | Establece el estado en **Floating** (flotante) |
+| `Super + f` | Establece el estado en **Fullscreen** |
+| `Super + g` | Intercambia la ventana actual con la ventana más grande |
+| `Super + y` | Envía el nodo marcado más reciente al preseleccionado |
+
+### 3. Navegación, Foco y Escritorios Virtuales
+
+| Atajo | Acción |
+| :--- | :--- |
+| `Super + [← / ↓ / ↑ / →]` | Mueve el foco hacia la ventana en esa dirección |
+| `Super + Shift + [← / ↓ / ↑ / →]` | Intercambia posición con la ventana en esa dirección |
+| `Super + 1 - 9, 0` | Cambia al escritorio virtual `I` al `X` |
+| `Super + Shift + 1 - 9, 0` | Mueve la ventana enfocada al escritorio `I` al `X` |
+| `Super + c` / `Super + Shift + c` | Foco en la siguiente / anterior ventana del escritorio |
+| `Super + [` / `Super + ]` | Cambia al escritorio anterior / siguiente del monitor actual |
+| `Super + Tab` / `Super + \`` | Alterna con el último escritorio o ventana activa |
+
+### 4. Redimensionamiento y Movimiento
+
+| Atajo | Acción |
+| :--- | :--- |
+| `Super + Alt + [← / ↓ / ↑ / →]` | Redimensionamiento dinámico en pasos fluidos con `bspwm_resize` |
+| `Super + Ctrl + Shift + [Flechas]` | Desplaza una ventana flotante 20px en esa dirección |
+| `Super + Ctrl + Alt + [Flechas]` | Preselecciona la dirección de apertura de la próxima ventana |
+| `Super + Ctrl + Alt + Espacio` | Cancela la preselección de la ventana enfocada |
+
+### 5. Control Multimedia y OSD en Pantalla
+
+| Tecla / Atajo | Acción |
+| :--- | :--- |
+| `XF86AudioRaiseVolume` | Sube el volumen un 5% y actualiza el OSD en tiempo real |
+| `XF86AudioLowerVolume` | Baja el volumen un 5% y actualiza el OSD en tiempo real |
+| `XF86AudioMute` | Alterna el silenciado (Mute) con indicador visual |
+| `XF86MonBrightnessUp` | Aumenta el brillo de pantalla un 5% con OSD |
+| `XF86MonBrightnessDown` | Reduce el brillo de pantalla un 5% con OSD |
+| `Super + Alt + t` | Alterna entre activar o desactivar el Touchpad (`synclient`) |
+
+### 6. Control Multi-Monitor (`xrandr`)
+
+| Atajo | Acción |
+| :--- | :--- |
+| `Super + Alt + e` | Extiende la pantalla al monitor externo a la izquierda |
+| `Super + Alt + m` | Duplica la pantalla (modo espejo nativo) |
+| `Super + Alt + Shift + m` | Duplica con escalado automático para resoluciones dispares |
+| `Super + Alt + i` | Desactiva pantallas externas y activa solo la pantalla interna |
+
+---
+
+## 🛠️ Funciones de Terminal y Pentesting
+
+Al desplegar Zsh, tendrás disponibles las siguientes herramientas en tu terminal:
 
 ```bash
-git clone https://github.com/TomasGutierrezOrozco/Autobspwm-ParrotOS.git
-cd Autobspwm-ParrotOS
+# 1. Extracción de puertos desde Nmap grepeable (-oG):
+extractPorts allPorts.gnmap
+# -> Muestra IP, puertos abiertos y los copia al portapapeles listos para nmap -sCV
+
+# 2. Configurar objetivo en Polybar:
+settarget 10.10.11.245 "CozyHosting"
+# -> Muestra en Polybar: 󰯐 10.10.11.245 - CozyHosting
+
+# 3. Limpiar objetivo en Polybar:
+cleartarget
+
+# 4. Creación instantánea de estructura de directorios:
+mkt
+# -> Crea carpetas: nmap/ content/ exploits/
+
+# 5. Limpieza general de cachés y optimización de disco:
+ClearCache
 ```
 
-Make scripts executable if needed:
+### Alias de Productividad:
+- `ls`, `ll`, `la`, `lla` -> Reemplazados por `lsd` con iconos y directorios primero.
+- `cat`, `catn`, `catnp` -> Reemplazados por `batcat` con resaltado de sintaxis.
+- `wifi` -> Lanza el asistente interactivo `nmtui`.
+- `bluetooth` -> Lanza `blueman-manager`.
+- `vpn-on` / `vpn-off` / `vpn-status` -> Control rápido de Tailscale.
 
-```bash
-chmod +x autobspwm install.sh backup.sh restore.sh uninstall.sh check.sh
-```
+---
 
-Validate the project:
-
-```bash
-./autobspwm check
-```
-
-Install the main environment:
-
-```bash
-./autobspwm install
-```
-
-Install the main environment plus optional secondary profiles:
-
-```bash
-./autobspwm install --with-optional
-```
-
-After installation, log out and select:
+## 🗂️ Estructura del Repositorio
 
 ```text
-bspwm autobspwm
+Autobspwm-ParrotOS/
+├── install.sh                  # Instalador maestro interactivo
+├── autobspwm                   # Wrapper CLI unificado (install, check, backup, restore)
+├── check.sh                    # Validador de dependencias, permisos y seguridad
+├── backup.sh                   # Motor de copias de seguridad automáticas
+├── restore.sh                  # Restaurador de backups previos
+├── uninstall.sh                # Desinstalador seguro con reversión
+├── packages/
+│   └── apt.txt                 # Lista oficial de paquetes APT requeridos
+├── lib/
+│   └── common.sh               # Librería común de colores, logging y helpers
+├── system/
+│   ├── dbus/                   # Prioridad exclusiva para el demonio Dunst
+│   └── xsession/               # Registro de sesión para el gestor de login (GDM/LightDM)
+└── config/
+    ├── bspwm/                  # bspwmrc y scripts (osd, resize, vpn, ethernet, target)
+    ├── sxhkd/                  # sxhkdrc con atajos ergonómicos y multimedia
+    ├── polybar/                # Arquitectura modular de 8 islas y scripts
+    ├── picom/                  # picom.conf (GLX, dual-kawase, use-damage)
+    ├── dunst/                  # dunstrc con estilo Nord y barras de progreso
+    ├── rofi/                   # config.rasi y temas redondeados
+    ├── kitty/                  # kitty.conf (Tokyo Night, powerline tabs, padding)
+    ├── nvim/                   # Suite Neovim NvChad completa
+    ├── zsh/                    # .zshrc, .p10k.zsh y .p10k-root.zsh (󰈸 flame)
+    ├── fonts/                  # Familia completa Hack Nerd Font, Iosevka y Feather
+    ├── wallpapers/             # Colección de fondos de pantalla HD
+    ├── gtk-2.0/, gtk-3.0/      # Temas oscuros y configuración visual GTK
+    └── home/                   # Dotfiles raíz (.fehbg, .Xresources, .gtkrc-2.0)
 ```
 
-## Main Command
+---
 
-Entry point:
+## 🔄 Respaldo, Restauración y Desinstalación
 
-```bash
-./autobspwm <command> [options]
-```
-
-Available commands:
-
-| Command | Description |
-| --- | --- |
-| `install` | Installs packages, creates a backup and copies configuration files. |
-| `backup` | Creates a timestamped backup of supported configuration paths. |
-| `restore` | Restores the latest backup or a selected backup. |
-| `uninstall` | Removes installed configuration and offers backup restoration. |
-| `check` | Validates project files, commands, packages and sensitive references. |
-| `help` | Shows basic usage information. |
-
-## Install Options
-
-Standard installation:
-
-```bash
-./autobspwm install
-```
-
-Extended installation:
-
-```bash
-./autobspwm install --with-optional
-```
-
-Equivalent environment variable:
-
-```bash
-INSTALL_OPTIONAL=1 ./autobspwm install
-```
-
-Required packages are listed in:
-
-```bash
-packages/apt.txt
-```
-
-Optional secondary-profile packages are listed in:
-
-```bash
-packages/optional.txt
-```
-
-Manual notes are listed in:
-
-```bash
-packages/manual.txt
-```
-
-## Backup And Restore
-
-Create a backup:
-
+### Crear un Respaldo Manual:
 ```bash
 ./autobspwm backup
+# O directamente:
+./backup.sh
 ```
+Los respaldos se almacenan con marca de tiempo en `~/.backup-autobspwm/YYYY-MM-DD_HH-MM-SS/`.
 
-Backups are stored in:
-
-```bash
-~/.backup-autobspwm/YYYY-MM-DD_HH-MM-SS/
-```
-
-Restore the latest backup:
-
+### Restaurar una Copia Previa:
 ```bash
 ./autobspwm restore
+# O especificar un respaldo concreto:
+./restore.sh 2026-09-05_09-45-00
 ```
 
-Restore a specific backup:
-
-```bash
-./autobspwm restore YYYY-MM-DD_HH-MM-SS
-```
-
-The restore command prints the affected files and asks for confirmation before copying anything back.
-
-## Uninstall
-
+### Desinstalar el Entorno:
 ```bash
 ./autobspwm uninstall
 ```
+El desinstalador retira las configuraciones instaladas, ofrece restaurar el respaldo original y pregunta si deseas purgar los paquetes instalados.
 
-The uninstall command:
+---
 
-- moves installed configuration into an uninstall backup directory.
-- offers to restore the latest available backup.
-- asks explicitly before removing apt packages.
-- does not remove unmanaged personal files.
+## 🔍 Comprobación de Integridad
 
-## Included Configuration
-
-Main desktop environment:
-
-- `bspwm`
-- `sxhkd`
-- `polybar`
-- `kitty`
-- `rofi`
-- `picom`
-- GTK 2/3/4 settings
-- `xsettingsd`
-- `zsh`
-- Powerlevel10k prompt configuration
-- wallpapers
-- local fonts
-- `flameshot`
-- touchpad toggle script
-
-Additional customization:
-
-- `nvim` with NvChad and the `bearded-arc` theme.
-- `neofetch`
-- `htop`
-- `geany`
-- `lxterminal`
-- `xfce4-terminal`
-- Konsole profiles and `GreenOnBlack` color scheme.
-- user MIME associations.
-- safe VS Code/Windsurf user settings.
-
-Captured secondary profiles:
-
-- `i3`
-- `openbox`
-- `lxpanel`
-- `pcmanfm`
-- selected MATE launchers
-- safe LXQt appearance settings
-
-Secondary-profile packages are installed only with `--with-optional`.
-
-## Keyboard Shortcuts
-
-The shortcuts are defined in:
+Antes o después de desplegar, puedes verificar el estado del entorno ejecutando:
 
 ```bash
-config/sxhkd/sxhkdrc
+./check.sh
 ```
 
-Common shortcuts:
+El script validará que todos los ejecutables tengan los permisos correctos, que los paquetes necesarios estén disponibles y garantizará que no exista ninguna fuga de credenciales o rutas privadas.
 
-| Shortcut | Action |
-| --- | --- |
-| `Super + Enter` | Open `kitty`. |
-| `Super + d` | Open `rofi -show run`. |
-| `Super + Escape` | Reload `sxhkd`. |
-| `Super + Shift + f` | Open Firefox. |
-| `Super + Shift + s` | Launch Flameshot GUI. |
-| `Super + e` | Open Caja. |
-| `Super + Alt + t` | Toggle touchpad. |
-| `Super + Shift + x` | Lock the session with `i3lock-fancy`. |
+---
 
-Window management:
+## 🔒 Privacidad y Sanitización (Zero Leakage)
 
-| Shortcut | Action |
-| --- | --- |
-| `Super + q` | Close focused window. |
-| `Super + Shift + q` | Quit bspwm or kill focused window, depending on the matching sxhkd expansion. |
-| `Super + Shift + r` | Restart bspwm. |
-| `Super + m` | Toggle tiled/monocle layout. |
-| `Super + t` | Set tiled state. |
-| `Super + Shift + t` | Set pseudo-tiled state. |
-| `Super + s` | Set floating state. |
-| `Super + f` | Set fullscreen state. |
-| `Super + 1-9,0` | Switch to desktop 1-10. |
-| `Super + Shift + 1-9,0` | Send focused window to desktop 1-10. |
+Este repositorio ha sido auditado de forma exhaustiva para asegurar que:
+- **No contiene credenciales ni contraseñas.**
+- **No contiene direcciones IP privadas** ni referencias a redes locales.
+- **No contiene accesos a servidores de almacenamiento o NAS.**
+- **No contiene historiales de terminal ni claves SSH/GPG.**
+- Todas las rutas a directorios son 100% dinámicas (`$HOME` y variables de entorno estándar).
 
-Monitor and hardware shortcuts:
+---
 
-| Shortcut | Action |
-| --- | --- |
-| `XF86AudioRaiseVolume` | Increase volume by 5%. |
-| `XF86AudioLowerVolume` | Decrease volume by 5%. |
-| `XF86AudioMute` | Toggle mute. |
-| `XF86MonBrightnessUp` | Increase brightness by 5%. |
-| `XF86MonBrightnessDown` | Decrease brightness by 5%. |
-| `Super + Alt + e` | Extend external monitor to the left. |
-| `Super + Alt + m` | Mirror displays. |
-| `Super + Alt + Shift + m` | Mirror displays with scaling. |
-| `Super + Alt + i` | Use internal display only. |
+## 📜 Licencia y Créditos
 
-## Security And Exclusions
+Desarrollado y personalizado por **Tomas Gutierrez (Fu11shoot)**.
 
-This project intentionally excludes:
-
-- credentials, secrets, tokens and private keys.
-- external-service access configuration.
-- persistent remote storage or mount configuration.
-- identity files, password stores and personal keyrings.
-- editor histories, caches, `globalStorage` and internal state.
-- nested configuration repositories such as `.git` inside copied configs.
-- external-service autostarts or file-sharing services.
-- desktop panels or shortcuts related to mounts.
-
-Local, non-portable integrations were removed from the included configuration.
-
-## Idempotency
-
-The installer is designed to be safely executed multiple times:
-
-- it creates a backup before copying files.
-- it copies configuration into predictable paths.
-- it keeps local fonts under `~/.local/share/fonts/autobspwm`.
-- it preserves previous backups.
-- it does not remove packages without confirmation.
-
-## Logs
-
-Logs are written to:
-
-```bash
-logs/autobspwm-YYYY-MM-DD_HH-MM-SS.log
-```
-
-Check the latest log:
-
-```bash
-ls -t logs/autobspwm-*.log | head -n 1
-tail -n 120 "$(ls -t logs/autobspwm-*.log | head -n 1)"
-```
-
-## Development Checks
-
-Validate Bash syntax:
-
-```bash
-bash -n autobspwm install.sh backup.sh restore.sh uninstall.sh check.sh lib/common.sh
-```
-
-Validate the project:
-
-```bash
-./autobspwm check
-```
-
-Search for sensitive references before publishing:
-
-```bash
-rg -n '/home/|credential|token|secret|password|private|key|mount|remote|server' config system
-```
-
-## License
-
-This project is distributed under a custom non-commercial license.
-
-Copyright (c) 2026 TomasGutierrezOrozco.
-
-Selling, sublicensing, monetizing, reselling, packaging as a paid product or using this project or derivative works for commercial purposes is not allowed without explicit written permission from the author.
-
-See [LICENSE](LICENSE) for the complete terms.
+Este proyecto está bajo una **Licencia No Comercial Personalizada**. Eres libre de usarlo, estudiarlo y adaptarlo para tu uso personal o profesional en auditorías. Queda prohibida su venta, sublicenciamiento o monetización directa sin autorización previa del autor. Consulta [`LICENSE`](LICENSE) para más detalles.

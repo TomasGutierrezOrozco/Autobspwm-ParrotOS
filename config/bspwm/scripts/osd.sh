@@ -31,20 +31,20 @@ send_notification() {
 
 case "$1" in
     vol_up)
-        pamixer --unmute --increase 5
-        vol=$(pamixer --get-volume)
+        pamixer --unmute --increase 5 >/dev/null 2>&1 || true
+        vol=$(pamixer --get-volume 2>/dev/null || echo 50)
         icon=$(get_vol_icon "$vol")
         send_notification "$VOL_ID" "$vol" "$icon" "Volumen" "${vol}%"
         ;;
     vol_down)
-        pamixer --decrease 5
-        vol=$(pamixer --get-volume)
+        pamixer --decrease 5 >/dev/null 2>&1 || true
+        vol=$(pamixer --get-volume 2>/dev/null || echo 50)
         icon=$(get_vol_icon "$vol")
         send_notification "$VOL_ID" "$vol" "$icon" "Volumen" "${vol}%"
         ;;
     vol_mute)
-        pamixer --toggle-mute
-        is_muted=$(pamixer --get-mute)
+        pamixer --toggle-mute >/dev/null 2>&1 || true
+        is_muted=$(pamixer --get-mute 2>/dev/null || echo "false")
         if [ "$is_muted" = "true" ]; then
             if command -v dunstify >/dev/null 2>&1; then
                 dunstify -a "OSD" -r "$VOL_ID" -u low -h int:value:0 -i audio-volume-muted "Audio" "Silenciado" -t 1500
@@ -52,20 +52,20 @@ case "$1" in
                 notify-send -r "$VOL_ID" -h string:x-dunst-stack-tag:osd -h int:value:0 -i audio-volume-muted "Audio Silenciado" -t 1500
             fi
         else
-            vol=$(pamixer --get-volume)
+            vol=$(pamixer --get-volume 2>/dev/null || echo 50)
             icon=$(get_vol_icon "$vol")
             send_notification "$VOL_ID" "$vol" "$icon" "Volumen" "${vol}%"
         fi
         ;;
     bright_up)
-        brightnessctl set +5% >/dev/null
-        bright=$(brightnessctl -m | awk -F, '{print $4}' | tr -d '%')
-        send_notification "$BRIGHT_ID" "$bright" "display-brightness" "Brillo" "${bright}%"
+        brightnessctl set +5% >/dev/null 2>&1 || true
+        bright=$(brightnessctl -m 2>/dev/null | awk -F, '{print $4}' | tr -d '%' || true)
+        [ -n "$bright" ] && send_notification "$BRIGHT_ID" "$bright" "display-brightness" "Brillo" "${bright}%"
         ;;
     bright_down)
-        brightnessctl set 5%- >/dev/null
-        bright=$(brightnessctl -m | awk -F, '{print $4}' | tr -d '%')
-        send_notification "$BRIGHT_ID" "$bright" "display-brightness" "Brillo" "${bright}%"
+        brightnessctl set 5%- >/dev/null 2>&1 || true
+        bright=$(brightnessctl -m 2>/dev/null | awk -F, '{print $4}' | tr -d '%' || true)
+        [ -n "$bright" ] && send_notification "$BRIGHT_ID" "$bright" "display-brightness" "Brillo" "${bright}%"
         ;;
     *)
         echo "Uso: $0 {vol_up|vol_down|vol_mute|bright_up|bright_down}"
