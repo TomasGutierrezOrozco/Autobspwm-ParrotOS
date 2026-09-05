@@ -4,11 +4,11 @@
 
 # terminal emulator
 super + Return
-	/opt/kitty/bin/kitty
+	kitty
 
 # program launcher
 super + d
-	/usr/bin/rofi -show drun
+	rofi -show drun
 
 # make sxhkd reload its configuration files:
 super + Escape
@@ -123,7 +123,7 @@ super + shift + z
 
 # Open firefox
 super + shift + f
-  /usr/bin/firefox
+  firefox
 
 # Open Minecraft Launcher
 super + shift + m
@@ -131,11 +131,14 @@ super + shift + m
 
 # Screenshots
 super + alt + s
-  /usr/bin/flameshot gui
+  flameshot gui
+
+Print
+  flameshot gui
 
 # Caja
 super + e
-  /usr/bin/caja
+  caja
 
 # Cambiar entre touchpad activo o no
 super + alt + t
@@ -166,7 +169,7 @@ XF86MonBrightnessDown
 
 # i3lock-fancy
 super + shift + x
-  /usr/bin/i3lock-fancy
+  i3lock-fancy
 
 # Extender monitor a la izquierda
 super + alt + e
