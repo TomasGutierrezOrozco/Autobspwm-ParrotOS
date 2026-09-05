@@ -1,15 +1,48 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-state="$(synclient -l | awk -F'=' '/TouchpadOff/ {gsub(/ /,"",$2); print $2; exit}')"
+notify() {
+  local msg="$1"
+  local icon="${2:-input-touchpad}"
+  if command -v dunstify >/dev/null 2>&1; then
+    dunstify -a "Touchpad" -u low -i "$icon" -r 3829 "Touchpad" "$msg" -t 1500
+  elif command -v notify-send >/dev/null 2>&1; then
+    notify-send -u low -i "$icon" "Touchpad" "$msg" -t 1500
+  fi
+}
 
-if [[ -z "${state}" ]]; then
-  echo "No se encontró TouchpadOff en synclient -l"
-  exit 1
+# 1. Intentar con synclient (legacy synaptics)
+if command -v synclient >/dev/null 2>&1 && synclient -l >/dev/null 2>&1; then
+  state="$(synclient -l | awk -F'=' '/TouchpadOff/ {gsub(/ /,"",$2); print $2; exit}')"
+  if [[ "$state" == "0" ]]; then
+    synclient TouchpadOff=1
+    notify "Touchpad Desactivado" "touchpad-disabled"
+  else
+    synclient TouchpadOff=0
+    notify "Touchpad Activado" "input-touchpad"
+  fi
+  exit 0
 fi
 
-if [[ "$state" == "0" ]]; then
-  synclient TouchpadOff=1
-else
-  synclient TouchpadOff=0
+# 2. Alternativa moderna universal con xinput (libinput)
+if command -v xinput >/dev/null 2>&1; then
+  # Buscar IDs de dispositivos touchpad
+  dev_ids=($(xinput list | grep -iE "touchpad|glidepoint|alps|synaptics" | grep -oP 'id=\K\d+'))
+  if [[ ${#dev_ids[@]} -gt 0 ]]; then
+    for dev_id in "${dev_ids[@]}"; do
+      # Comprobar estado de 'Device Enabled'
+      enabled="$(xinput list-props "$dev_id" 2>/dev/null | awk '/Device Enabled/ {print $NF; exit}')"
+      if [[ "$enabled" == "1" ]]; then
+        xinput set-prop "$dev_id" "Device Enabled" 0 2>/dev/null || true
+        notify "Touchpad Desactivado" "touchpad-disabled"
+      else
+        xinput set-prop "$dev_id" "Device Enabled" 1 2>/dev/null || true
+        notify "Touchpad Activado" "input-touchpad"
+      fi
+    done
+    exit 0
+  fi
 fi
+
+echo "No se detectó controlador de touchpad compatible (synclient o xinput)." >&2
+exit 1

@@ -11,6 +11,8 @@ if [ -f "$HOME/powerlevel10k/powerlevel10k.zsh-theme" ]; then
     source "$HOME/powerlevel10k/powerlevel10k.zsh-theme"
 elif [ -f "/usr/share/powerlevel10k/powerlevel10k.zsh-theme" ]; then
     source "/usr/share/powerlevel10k/powerlevel10k.zsh-theme"
+elif [ -f "/usr/share/zsh-theme-powerlevel10k/powerlevel10k.zsh-theme" ]; then
+    source "/usr/share/zsh-theme-powerlevel10k/powerlevel10k.zsh-theme"
 fi
 
 # Zsh plugins (Debian/Parrot/Kali & Arch Linux)
@@ -20,9 +22,32 @@ done
 for p in /usr/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh /usr/share/zsh/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh; do
   [ -f "$p" ] && { source "$p"; break; }
 done
+
+# Sudo plugin / fallback nativo para doble escape
+SUDO_LOADED=0
 for p in /usr/share/zsh-sudo/sudo.plugin.zsh /usr/share/zsh/plugins/zsh-sudo/sudo.plugin.zsh; do
-  [ -f "$p" ] && { source "$p"; break; }
+  if [ -f "$p" ]; then
+    source "$p"
+    SUDO_LOADED=1
+    break
+  fi
 done
+
+if [ "$SUDO_LOADED" -eq 0 ]; then
+  # Implementación nativa de sudo en línea de comandos (doble Escape)
+  sudo-command-line() {
+    [[ -z $BUFFER ]] && zle up-history
+    if [[ $BUFFER == sudo\ * ]]; then
+      LBUFFER="${LBUFFER#sudo }"
+    elif [[ $BUFFER =~ ^[[:space:]]*$ ]]; then
+      return
+    else
+      LBUFFER="sudo $LBUFFER"
+    fi
+  }
+  zle -N sudo-command-line
+  bindkey "\e\e" sudo-command-line
+fi
 
 # History
 HISTFILE=~/.zsh_history

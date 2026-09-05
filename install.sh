@@ -66,14 +66,25 @@ install_packages() {
           aur_helper="yay"
         elif command -v paru >/dev/null 2>&1; then
           aur_helper="paru"
+        else
+          info "No se detectó un helper de AUR (yay/paru)."
+          if prompt_confirm "¿Deseas compilar e instalar yay-bin automáticamente desde AUR?" "Y"; then
+            local tmp_yay
+            tmp_yay="$(mktemp -d)"
+            if git clone --depth=1 https://aur.archlinux.org/yay-bin.git "$tmp_yay/yay-bin" >/dev/null 2>&1; then
+              info "Compilando yay-bin con makepkg..."
+              (cd "$tmp_yay/yay-bin" && makepkg -si --noconfirm) || warn "No se pudo compilar yay-bin automáticamente."
+              command -v yay >/dev/null 2>&1 && aur_helper="yay"
+            fi
+            rm -rf "$tmp_yay"
+          fi
         fi
 
         if [[ -n "$aur_helper" ]]; then
           info "Instalando paquetes AUR detectados con $aur_helper: ${aur_packages[*]}..."
           "$aur_helper" -S --needed --noconfirm "${aur_packages[@]}" || warn "Algunos paquetes AUR no se pudieron instalar automáticamente."
         else
-          warn "No se detectó yay ni paru para instalar dependencias de AUR: ${aur_packages[*]}"
-          warn "Por favor instálalos manualmente o instala yay/paru."
+          warn "Omitiendo instalación directa desde AUR. Se utilizarán métodos autónomos de respaldo."
         fi
       fi
     fi
@@ -90,6 +101,64 @@ install_packages() {
     sudo_cmd apt install -y "${packages[@]}"
     ok "Paquetes instalados correctamente."
   fi
+
+  # Métodos de respaldo autónomos para asegurar experiencia out-of-the-box
+  ensure_i3lock_fancy
+  ensure_cursor_theme
+}
+
+ensure_i3lock_fancy() {
+  if command -v i3lock-fancy >/dev/null 2>&1; then
+    ok "i3lock-fancy se encuentra instalado y funcional."
+    return 0
+  fi
+
+  if ! has_internet; then
+    warn "Sin conexión a internet; no se pudo desplegar i3lock-fancy automáticamente."
+    return 0
+  fi
+
+  info "Instalando i3lock-fancy de forma autónoma desde GitHub..."
+  local tmp_dir
+  tmp_dir="$(mktemp -d)"
+  if git clone --depth=1 https://github.com/meskarune/i3lock-fancy.git "$tmp_dir/i3lock-fancy" >/dev/null 2>&1; then
+    sudo_cmd make -C "$tmp_dir/i3lock-fancy" install >/dev/null 2>&1 || {
+      sudo_cmd install -Dm755 "$tmp_dir/i3lock-fancy/lock" /usr/local/bin/i3lock-fancy
+      sudo_cmd mkdir -p /usr/local/share/i3lock-fancy/icons
+      sudo_cmd cp -a "$tmp_dir/i3lock-fancy/icons/." /usr/local/share/i3lock-fancy/icons/ 2>/dev/null || true
+    }
+    rm -rf "$tmp_dir"
+    ok "i3lock-fancy desplegado en /usr/local/bin/i3lock-fancy."
+  else
+    warn "No se pudo clonar i3lock-fancy desde GitHub."
+    rm -rf "$tmp_dir"
+  fi
+}
+
+ensure_cursor_theme() {
+  local target_theme="/usr/share/icons/Bibata-Modern-Ice"
+  local user_theme="$USER_HOME/.local/share/icons/Bibata-Modern-Ice"
+  if [[ -d "$target_theme" || -d "$user_theme" ]]; then
+    ok "Tema de cursor Bibata-Modern-Ice disponible."
+    return 0
+  fi
+
+  if ! has_internet; then
+    return 0
+  fi
+
+  info "Descargando tema de cursor Bibata-Modern-Ice de respaldo..."
+  local tmp_dir
+  tmp_dir="$(mktemp -d)"
+  local url="https://github.com/ful1e5/Bibata_Cursor/releases/latest/download/Bibata-Modern-Ice.tar.xz"
+  if curl -sL "$url" -o "$tmp_dir/bibata.tar.xz" 2>/dev/null; then
+    safe_mkdir "$USER_HOME/.local/share/icons"
+    tar -xf "$tmp_dir/bibata.tar.xz" -C "$USER_HOME/.local/share/icons/" 2>/dev/null || true
+    sudo_cmd mkdir -p /usr/local/share/icons
+    sudo_cmd tar -xf "$tmp_dir/bibata.tar.xz" -C /usr/local/share/icons/ 2>/dev/null || true
+    ok "Tema de cursor Bibata-Modern-Ice desplegado correctamente."
+  fi
+  rm -rf "$tmp_dir"
 }
 
 install_fonts() {

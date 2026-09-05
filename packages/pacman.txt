@@ -9,18 +9,21 @@ feh
 zsh
 xsettingsd
 lxappearance
+caja
 
 # Notificaciones y OSD
 dunst
 libnotify
 
-# Control de hardware y multimedia
+# Control de hardware, pantalla y multimedia
 pamixer
 brightnessctl
 pavucontrol
 pipewire
 pipewire-pulse
 flameshot
+i3lock
+imagemagick
 mate-power-manager
 
 # Utilidades de shell y productividad
@@ -31,18 +34,23 @@ fzf
 zsh-autosuggestions
 zsh-syntax-highlighting
 
-# X11, utilidades y fuentes base
+# X11, utilidades, control de ventanas y fuentes base
 xorg-server
+xorg-xinit
 xorg-xrandr
 xorg-xrdb
 xorg-xsetroot
 xorg-xev
 xorg-xprop
+xdotool
+xdo
+wmname
 xf86-input-synaptics
 fontconfig
 cantarell-fonts
 ttf-font-awesome
 noto-fonts-emoji
+xcursor-breeze
 
 # Dependencias de instalacion y compilacion
 git

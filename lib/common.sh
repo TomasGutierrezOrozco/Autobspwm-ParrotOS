@@ -122,12 +122,13 @@ detect_distro() {
 
 has_internet() {
   if command -v curl >/dev/null 2>&1; then
-    curl -Is --connect-timeout 5 https://deb.debian.org >/dev/null 2>&1 && return 0
+    curl -Is --connect-timeout 5 https://1.1.1.1 >/dev/null 2>&1 && return 0
+    curl -Is --connect-timeout 5 https://github.com >/dev/null 2>&1 && return 0
   fi
   if command -v ping >/dev/null 2>&1; then
     ping -c 1 -W 3 1.1.1.1 >/dev/null 2>&1 && return 0
   fi
-  getent hosts deb.debian.org >/dev/null 2>&1
+  getent hosts archlinux.org >/dev/null 2>&1 || getent hosts deb.debian.org >/dev/null 2>&1
 }
 
 safe_mkdir() {

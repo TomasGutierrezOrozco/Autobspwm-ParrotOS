@@ -30,7 +30,7 @@ check_commands() {
     fi
   done
 
-  local optional_commands=(synclient i3lock-fancy nvim lsd fzf xclip)
+  local optional_commands=(i3lock-fancy nvim lsd fzf xclip)
   for optional in "${optional_commands[@]}"; do
     if command -v "$optional" >/dev/null 2>&1; then
       status_ok "Opcional disponible: $optional"
@@ -44,6 +44,13 @@ check_commands() {
     status_ok "Opcional disponible: bat"
   else
     info "Opcional no disponible en este sistema: bat / batcat"
+  fi
+  if command -v synclient >/dev/null 2>&1; then
+    status_ok "Controlador Touchpad disponible: synclient (synaptics)"
+  elif command -v xinput >/dev/null 2>&1; then
+    status_ok "Controlador Touchpad disponible: xinput (libinput)"
+  else
+    info "Controlador Touchpad no detectado (synclient / xinput)"
   fi
 }
 
