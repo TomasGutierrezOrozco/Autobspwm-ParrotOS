@@ -1,4 +1,4 @@
-# Autobspwm-ParrotOS 🦅🔥
+# Autobspwm-ParrotOS
 
 [![Platform](https://img.shields.io/badge/Platform-Parrot%20Security%20OS%20%7C%20Kali%20Linux-blue?style=for-the-badge&logo=linux)](https://parrotsec.org/)
 [![Window Manager](https://img.shields.io/badge/WM-BSPWM%200.9.10-green?style=for-the-badge&logo=archlinux)](https://github.com/baskerville/bspwm)
@@ -9,11 +9,11 @@
 
 Instalador automatizado e interactivo para desplegar un entorno de trabajo profesional, minimalista y de alto rendimiento basado en **BSPWM** sobre **Parrot Security OS** y **Kali Linux**, con soporte planificado para Arch Linux.
 
-El proyecto incluye un rice estético moderno (Nord / Tokyo Night), compositor Picom de ultra bajo consumo, barra de estado Polybar en 8 islas modulares, OSD en tiempo real para volumen y brillo, terminal Kitty, utilidades de pentesting integradas y sincronización total de entorno con el usuario **root** (icono de la llama `󰈸`).
+El proyecto incluye un rice estético moderno (Nord / Tokyo Night), compositor Picom de ultra bajo consumo, barra de estado Polybar en 8 islas modulares, OSD en tiempo real para volumen y brillo, terminal Kitty, utilidades de pentesting integradas y sincronización total de entorno con el usuario **root** (icono distintivo de la llama en el prompt).
 
 ---
 
-## 📸 Galería Visual
+## Galería Visual
 
 ### Vista General del Escritorio (Polybar modular, fondo y escritorios)
 ![Vista general del escritorio](assets/screenshots/desktop-overview.png)
@@ -26,11 +26,11 @@ El proyecto incluye un rice estético moderno (Nord / Tokyo Night), compositor P
 
 ---
 
-## ✨ Características Principales
+## Características Principales
 
-- 🚀 **Instalador Interactivo y Autónomo:** Menú con banners ASCII en color, confirmaciones paso a paso, prechequeo de dependencias y opción de instalación desatendida (`-y`).
-- 🪟 **Gestión de Ventanas Avanzada:** `bspwm` y `sxhkd` con atajos ergonómicos, redimensionamiento inteligente (`bspwm_resize`) y reglas para ventanas flotantes.
-- 🏝️ **Polybar en 8 Islas Modulares:**
+- **Instalador Interactivo y Autónomo:** Menú con banners ASCII en color, confirmaciones paso a paso, prechequeo de dependencias y opción de instalación desatendida (`-y`).
+- **Gestión de Ventanas Avanzada:** `bspwm` y `sxhkd` con atajos ergonómicos, redimensionamiento inteligente (`bspwm_resize`) y reglas para ventanas flotantes.
+- **Polybar en 8 Islas Modulares:**
   1. *Log / Logo*: Menú interactivo de aplicaciones.
   2. *Ethernet Status*: Detección automática de la interfaz de red activa (Wi-Fi o cable Ethernet).
   3. *VPN Status*: Detección dinámica y priorizada para `tun*` (HackTheBox / TryHackMe / OpenVPN), `wg*` (WireGuard) y `tailscale*`.
@@ -38,23 +38,23 @@ El proyecto incluye un rice estético moderno (Nord / Tokyo Night), compositor P
   5. *Workspaces (Centro)*: Renderizado interactivo de los escritorios virtuales (`I` al `X`).
   6. *Target Status*: Monitor en vivo para objetivos de pentesting (`settarget` / `cleartarget`).
   7. *Primary Bar*: Menú de apagado, reinicio, suspensión y bloqueo de sesión.
-- 🔔 **Notificaciones y OSD con Dunst:** Tema Nord integrado, bordes redondeados (12px), anulación de servicios D-Bus para evitar colisiones con MATE y barras de progreso fluidas para el control de volumen y brillo en pantalla.
-- ⚡ **Compositor Picom de Alto Rendimiento:** Desenfoque `dual_kawase`, sombras suaves, esquinas redondeadas (20px), sincronización vertical (`vsync = true`) y seguimiento de daños (`use-damage = true`) para evitar el consumo excesivo de CPU y ahorrar batería en laptops.
-- 🔍 **Lanzador Rofi:** Modo `drun` con iconos y tema moderno `rounded-nord-dark.rasi`.
-- 💻 **Terminal Kitty & Editor Neovim:** Paleta Tokyo Night, pestañas con estilo Powerline y suite Neovim preconfigurada con NvChad.
-- 🐚 **Zsh + Powerlevel10k:** Autocompletado enriquecido con colores, historial persistente, plugins (`autosuggestions`, `syntax-highlighting`, `sudo`) y utilidades CLI modernas (`lsd`, `batcat`, `fzf`, `xclip`).
-- 🎯 **Funciones de Pentesting Integradas en Shell:**
+- **Notificaciones y OSD con Dunst:** Tema Nord integrado, bordes redondeados (12px), anulación de servicios D-Bus para evitar colisiones con MATE y barras de progreso fluidas para el control de volumen y brillo en pantalla.
+- **Compositor Picom de Alto Rendimiento:** Desenfoque `dual_kawase`, sombras suaves, esquinas redondeadas (20px), sincronización vertical (`vsync = true`) y seguimiento de daños (`use-damage = true`) para evitar el consumo excesivo de CPU y ahorrar batería en laptops.
+- **Lanzador Rofi:** Modo `drun` con iconos y tema moderno `rounded-nord-dark.rasi`.
+- **Terminal Kitty & Editor Neovim:** Paleta Tokyo Night, pestañas con estilo Powerline y suite Neovim preconfigurada con NvChad.
+- **Zsh + Powerlevel10k:** Autocompletado enriquecido con colores, historial persistente, plugins (`autosuggestions`, `syntax-highlighting`, `sudo`) y utilidades CLI modernas (`lsd`, `batcat`, `fzf`, `xclip`).
+- **Funciones de Pentesting Integradas en Shell:**
   - `extractPorts`: Parsea capturas grepeables de Nmap, formatea la salida y copia automáticamente los puertos abiertos al portapapeles.
   - `settarget` / `cleartarget`: Configura o limpia la IP y nombre del objetivo en Polybar.
   - `mkt`: Genera en un segundo la estructura estándar de directorios para auditorías (`nmap/`, `content/`, `exploits/`).
   - `ClearCache`: Script de mantenimiento que limpia cachés de APT, Flatpak, Thumbnails, pip, compilaciones de Go y logs de systemd.
-- 󰈸 **Paridad Completa con Usuario Root:** Sincronización automática de Zsh, Neovim, Kitty y prompt de Powerlevel10k personalizado con el distintivo icono de la llama (`󰈸`).
-- 🔤 **Tipografías Incluidas:** Familia completa de `Hack Nerd Font` (12 variantes), `Iosevka Nerd Font`, `Hurmit Nerd Font Mono`, `Helvetica` y `Feather Icons`.
-- 🛡️ **Seguridad y Respaldo:** Backup automático fechado en `~/.backup-autobspwm/` antes de tocar cualquier archivo, con scripts de restauración (`restore.sh`) y desinstalación limpia (`uninstall.sh`).
+- **Paridad Completa con Usuario Root:** Sincronización automática de Zsh, Neovim, Kitty y prompt de Powerlevel10k personalizado con el distintivo icono de la llama.
+- **Tipografías Incluidas:** Familia completa de `Hack Nerd Font` (12 variantes), `Iosevka Nerd Font`, `Hurmit Nerd Font Mono`, `Helvetica` y `Feather Icons`.
+- **Seguridad y Respaldo:** Backup automático fechado en `~/.backup-autobspwm/` antes de tocar cualquier archivo, con scripts de restauración (`restore.sh`) y desinstalación limpia (`uninstall.sh`).
 
 ---
 
-## 📋 Requisitos del Sistema
+## Requisitos del Sistema
 
 - **Distribución:** Parrot Security OS 6.x / 7.x, Kali Linux 2024.x / 2025.x (o derivados de Debian).
 - **Servidor Gráfico:** X11.
@@ -66,7 +66,7 @@ El proyecto incluye un rice estético moderno (Nord / Tokyo Night), compositor P
 
 ---
 
-## 🚀 Instalación Rápida
+## Instalación Rápida
 
 1. **Clona el repositorio en tu máquina:**
    ```bash
@@ -94,7 +94,7 @@ El proyecto incluye un rice estético moderno (Nord / Tokyo Night), compositor P
 
 ---
 
-## ⌨️ Guía Completa de Atajos de Teclado
+## Guía Completa de Atajos de Teclado
 
 Los atajos están orquestados por `sxhkd` (`~/.config/sxhkd/sxhkdrc`).
 
@@ -171,7 +171,7 @@ Los atajos están orquestados por `sxhkd` (`~/.config/sxhkd/sxhkdrc`).
 
 ---
 
-## 🛠️ Funciones de Terminal y Pentesting
+## Funciones de Terminal y Pentesting
 
 Al desplegar Zsh, tendrás disponibles las siguientes herramientas en tu terminal:
 
@@ -182,7 +182,7 @@ extractPorts allPorts.gnmap
 
 # 2. Configurar objetivo en Polybar:
 settarget 10.10.11.245 "CozyHosting"
-# -> Muestra en Polybar: 󰯐 10.10.11.245 - CozyHosting
+# -> Muestra en Polybar: 10.10.11.245 - CozyHosting
 
 # 3. Limpiar objetivo en Polybar:
 cleartarget
@@ -204,7 +204,7 @@ ClearCache
 
 ---
 
-## 🗂️ Estructura del Repositorio
+## Estructura del Repositorio
 
 ```text
 Autobspwm-ParrotOS/
@@ -230,7 +230,7 @@ Autobspwm-ParrotOS/
     ├── rofi/                   # config.rasi y temas redondeados
     ├── kitty/                  # kitty.conf (Tokyo Night, powerline tabs, padding)
     ├── nvim/                   # Suite Neovim NvChad completa
-    ├── zsh/                    # .zshrc, .p10k.zsh y .p10k-root.zsh (󰈸 flame)
+    ├── zsh/                    # .zshrc, .p10k.zsh y .p10k-root.zsh (flame prompt root)
     ├── fonts/                  # Familia completa Hack Nerd Font, Iosevka y Feather
     ├── wallpapers/             # Colección de fondos de pantalla HD
     ├── gtk-2.0/, gtk-3.0/      # Temas oscuros y configuración visual GTK
@@ -239,7 +239,7 @@ Autobspwm-ParrotOS/
 
 ---
 
-## 🔄 Respaldo, Restauración y Desinstalación
+## Respaldo, Restauración y Desinstalación
 
 ### Crear un Respaldo Manual:
 ```bash
@@ -264,7 +264,7 @@ El desinstalador retira las configuraciones instaladas, ofrece restaurar el resp
 
 ---
 
-## 🔍 Comprobación de Integridad
+## Comprobación de Integridad
 
 Antes o después de desplegar, puedes verificar el estado del entorno ejecutando:
 
@@ -276,7 +276,7 @@ El script validará que todos los ejecutables tengan los permisos correctos, que
 
 ---
 
-## 🔒 Privacidad y Sanitización (Zero Leakage)
+## Privacidad y Sanitización (Zero Leakage)
 
 Este repositorio ha sido auditado de forma exhaustiva para asegurar que:
 - **No contiene credenciales ni contraseñas.**
@@ -287,7 +287,7 @@ Este repositorio ha sido auditado de forma exhaustiva para asegurar que:
 
 ---
 
-## 📜 Licencia y Créditos
+## Licencia y Créditos
 
 Desarrollado y personalizado por **Tomas Gutierrez (Fu11shoot)**.
 
