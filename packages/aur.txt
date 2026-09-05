@@ -1,0 +1,3 @@
+# Paquetes requeridos desde AUR (instalables con yay o paru)
+i3lock-fancy-git
+bibata-cursor-theme-bin

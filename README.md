@@ -1,13 +1,13 @@
 # Autobspwm-ParrotOS
 
-[![Platform](https://img.shields.io/badge/Platform-Parrot%20Security%20OS%20%7C%20Kali%20Linux-blue?style=for-the-badge&logo=linux)](https://parrotsec.org/)
+[![Platform](https://img.shields.io/badge/Platform-Arch%20Linux%20%7C%20Parrot%20%7C%20Kali-blue?style=for-the-badge&logo=archlinux)](https://archlinux.org/)
 [![Window Manager](https://img.shields.io/badge/WM-BSPWM%200.9.10-green?style=for-the-badge&logo=archlinux)](https://github.com/baskerville/bspwm)
 [![Shell](https://img.shields.io/badge/Shell-Zsh%20%2B%20Powerlevel10k-orange?style=for-the-badge&logo=gnubash)](https://github.com/romkatv/powerlevel10k)
 [![Editor](https://img.shields.io/badge/Editor-Neovim%20%28NvChad%29-brightgreen?style=for-the-badge&logo=neovim)](https://neovim.io/)
 [![Status Bar](https://img.shields.io/badge/Bar-Polybar%20%288%20Islands%29-purple?style=for-the-badge)](https://github.com/polybar/polybar)
 [![License](https://img.shields.io/badge/License-Custom%20Non--Commercial-red?style=for-the-badge)](LICENSE)
 
-Instalador automatizado e interactivo para desplegar un entorno de trabajo profesional, minimalista y de alto rendimiento basado en **BSPWM** sobre **Parrot Security OS** y **Kali Linux**, con soporte planificado para Arch Linux.
+Instalador automatizado e interactivo para desplegar un entorno de trabajo profesional, minimalista y de alto rendimiento basado en **BSPWM** sobre **Arch Linux**, **Parrot Security OS** y **Kali Linux**.
 
 El proyecto incluye un rice estético moderno (Nord / Tokyo Night), compositor Picom de ultra bajo consumo, barra de estado Polybar en 8 islas modulares, OSD en tiempo real para volumen y brillo, terminal Kitty, utilidades de pentesting integradas y sincronización total de entorno con el usuario **root** (icono distintivo de la llama en el prompt).
 
@@ -56,10 +56,10 @@ El proyecto incluye un rice estético moderno (Nord / Tokyo Night), compositor P
 
 ## Requisitos del Sistema
 
-- **Distribución:** Parrot Security OS 6.x / 7.x, Kali Linux 2024.x / 2025.x (o derivados de Debian).
+- **Distribución:** Arch Linux (y derivados como EndeavourOS, BlackArch, Manjaro), Parrot Security OS 6.x / 7.x, Kali Linux 2024.x / 2025.x.
 - **Servidor Gráfico:** X11.
 - **Usuario:** Usuario normal con privilegios de `sudo`.
-- **Conexión a Internet:** Requerida durante la primera instalación para descargar los paquetes APT y dependencias.
+- **Conexión a Internet:** Requerida durante la primera instalación para descargar paquetes y dependencias.
 
 > [!IMPORTANT]
 > Ejecuta el instalador con tu usuario normal. Si requieres permisos administrativos, el script solicitará tu contraseña de `sudo` de forma segura.
@@ -215,7 +215,9 @@ Autobspwm-ParrotOS/
 ├── restore.sh                  # Restaurador de backups previos
 ├── uninstall.sh                # Desinstalador seguro con reversión
 ├── packages/
-│   └── apt.txt                 # Lista oficial de paquetes APT requeridos
+│   ├── apt.txt                 # Lista oficial de paquetes para Debian/Parrot/Kali (APT)
+│   ├── pacman.txt              # Lista oficial de paquetes para Arch Linux (Pacman)
+│   └── aur.txt                 # Paquetes complementarios de AUR (yay/paru)
 ├── lib/
 │   └── common.sh               # Librería común de colores, logging y helpers
 ├── system/

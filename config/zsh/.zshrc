@@ -13,10 +13,16 @@ elif [ -f "/usr/share/powerlevel10k/powerlevel10k.zsh-theme" ]; then
     source "/usr/share/powerlevel10k/powerlevel10k.zsh-theme"
 fi
 
-# Zsh plugins
-[ -f /usr/share/zsh-autosuggestions/zsh-autosuggestions.zsh ] && source /usr/share/zsh-autosuggestions/zsh-autosuggestions.zsh
-[ -f /usr/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh ] && source /usr/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
-[ -f /usr/share/zsh-sudo/sudo.plugin.zsh ] && source /usr/share/zsh-sudo/sudo.plugin.zsh
+# Zsh plugins (Debian/Parrot/Kali & Arch Linux)
+for p in /usr/share/zsh-autosuggestions/zsh-autosuggestions.zsh /usr/share/zsh/plugins/zsh-autosuggestions/zsh-autosuggestions.zsh; do
+  [ -f "$p" ] && { source "$p"; break; }
+done
+for p in /usr/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh /usr/share/zsh/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh; do
+  [ -f "$p" ] && { source "$p"; break; }
+done
+for p in /usr/share/zsh-sudo/sudo.plugin.zsh /usr/share/zsh/plugins/zsh-sudo/sudo.plugin.zsh; do
+  [ -f "$p" ] && { source "$p"; break; }
+done
 
 # History
 HISTFILE=~/.zsh_history
@@ -48,10 +54,16 @@ zstyle ':completion:*:kill:*' command 'ps -u $USER -o pid,%cpu,tty,cputime,cmd'
 
 # Custom Aliases
 # -----------------------------------------------
-# bat
-alias cat='batcat'
-alias catn='batcat --style=plain'
-alias catnp='batcat --style=plain --paging=never'
+# bat / batcat
+if command -v batcat >/dev/null 2>&1; then
+  alias cat='batcat'
+  alias catn='batcat --style=plain'
+  alias catnp='batcat --style=plain --paging=never'
+elif command -v bat >/dev/null 2>&1; then
+  alias cat='bat'
+  alias catn='bat --style=plain'
+  alias catnp='bat --style=plain --paging=never'
+fi
 
 # ls
 alias ll='lsd -lh --group-dirs=first'

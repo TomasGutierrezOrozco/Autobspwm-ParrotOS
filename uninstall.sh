@@ -46,16 +46,29 @@ maybe_restore_backup() {
 }
 
 maybe_remove_packages() {
-  read -r -p "¿Eliminar paquetes apt listados en packages/apt.txt? [y/N] " answer
-  [[ "$answer" =~ ^[Yy]$ ]] || {
-    info "No se eliminaron paquetes"
-    return 0
-  }
+  local distro
+  distro="$(detect_distro)"
 
-  mapfile -t packages < <(read_package_list "$PROJECT_DIR/packages/apt.txt")
-  ((${#packages[@]} > 0)) || return 0
-  sudo_cmd apt remove -y "${packages[@]}"
-  warn "Revisa manualmente paquetes huérfanos antes de usar apt autoremove"
+  if [[ "$distro" == "arch" ]]; then
+    read -r -p "¿Eliminar paquetes pacman listados en packages/pacman.txt? [y/N] " answer
+    [[ "$answer" =~ ^[Yy]$ ]] || {
+      info "No se eliminaron paquetes"
+      return 0
+    }
+    mapfile -t packages < <(read_package_list "$PROJECT_DIR/packages/pacman.txt")
+    ((${#packages[@]} > 0)) || return 0
+    sudo_cmd pacman -Rns --noconfirm "${packages[@]}" || warn "Algunos paquetes no se pudieron eliminar automáticamente."
+  else
+    read -r -p "¿Eliminar paquetes apt listados en packages/apt.txt? [y/N] " answer
+    [[ "$answer" =~ ^[Yy]$ ]] || {
+      info "No se eliminaron paquetes"
+      return 0
+    }
+    mapfile -t packages < <(read_package_list "$PROJECT_DIR/packages/apt.txt")
+    ((${#packages[@]} > 0)) || return 0
+    sudo_cmd apt remove -y "${packages[@]}"
+    warn "Revisa manualmente paquetes huérfanos antes de usar apt autoremove"
+  fi
 }
 
 main() {

@@ -43,16 +43,53 @@ parse_args() {
 }
 
 install_packages() {
-  local apt_file="$PROJECT_DIR/packages/apt.txt"
-  mapfile -t packages < <(read_package_list "$apt_file")
-  ((${#packages[@]} > 0)) || return 0
+  local distro
+  distro="$(detect_distro)"
 
-  info "Actualizando repositorios apt..."
-  sudo_cmd apt update
+  if [[ "$distro" == "arch" ]]; then
+    local pacman_file="$PROJECT_DIR/packages/pacman.txt"
+    mapfile -t packages < <(read_package_list "$pacman_file")
+    ((${#packages[@]} > 0)) || return 0
 
-  info "Instalando paquetes y dependencias base del entorno..."
-  sudo_cmd apt install -y "${packages[@]}"
-  ok "Paquetes instalados correctamente."
+    info "Sincronizando repositorios de pacman..."
+    sudo_cmd pacman -Sy
+
+    info "Instalando paquetes y dependencias base con pacman..."
+    sudo_cmd pacman -S --needed --noconfirm "${packages[@]}"
+
+    local aur_file="$PROJECT_DIR/packages/aur.txt"
+    if [[ -f "$aur_file" ]]; then
+      mapfile -t aur_packages < <(read_package_list "$aur_file")
+      if ((${#aur_packages[@]} > 0)); then
+        local aur_helper=""
+        if command -v yay >/dev/null 2>&1; then
+          aur_helper="yay"
+        elif command -v paru >/dev/null 2>&1; then
+          aur_helper="paru"
+        fi
+
+        if [[ -n "$aur_helper" ]]; then
+          info "Instalando paquetes AUR detectados con $aur_helper: ${aur_packages[*]}..."
+          "$aur_helper" -S --needed --noconfirm "${aur_packages[@]}" || warn "Algunos paquetes AUR no se pudieron instalar automáticamente."
+        else
+          warn "No se detectó yay ni paru para instalar dependencias de AUR: ${aur_packages[*]}"
+          warn "Por favor instálalos manualmente o instala yay/paru."
+        fi
+      fi
+    fi
+    ok "Paquetes de Arch Linux procesados correctamente."
+  else
+    local apt_file="$PROJECT_DIR/packages/apt.txt"
+    mapfile -t packages < <(read_package_list "$apt_file")
+    ((${#packages[@]} > 0)) || return 0
+
+    info "Actualizando repositorios apt..."
+    sudo_cmd apt update
+
+    info "Instalando paquetes y dependencias base del entorno..."
+    sudo_cmd apt install -y "${packages[@]}"
+    ok "Paquetes instalados correctamente."
+  fi
 }
 
 install_fonts() {
@@ -245,9 +282,11 @@ main() {
   local distro
   distro="$(detect_distro)"
   if [[ "$distro" == "arch" ]]; then
-    die "Se detectó Arch Linux. El soporte para Arch está planeado para la Fase 2 de Autobspwm. Actualmente este instalador soporta Parrot Security OS y Kali Linux."
-  elif [[ "$distro" != "debian" ]]; then
-    warn "Distribución no identificada directamente como Debian/Parrot/Kali. Continuando bajo tu propio riesgo..."
+    info "Distribución detectada: Arch Linux (o derivada). Usando gestor pacman y soporte AUR..."
+  elif [[ "$distro" == "debian" ]]; then
+    info "Distribución detectada: Debian/Parrot/Kali. Usando gestor apt..."
+  else
+    warn "Distribución no identificada directamente como Debian o Arch. Continuando bajo tu propio riesgo..."
   fi
 
   cat << "RESUMEN"

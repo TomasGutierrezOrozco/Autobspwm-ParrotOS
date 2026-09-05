@@ -1,0 +1,51 @@
+# Entorno base BSPWM
+bspwm
+sxhkd
+polybar
+picom
+rofi
+kitty
+feh
+zsh
+xsettingsd
+lxappearance
+
+# Notificaciones y OSD
+dunst
+libnotify
+
+# Control de hardware y multimedia
+pamixer
+brightnessctl
+pavucontrol
+pipewire
+pipewire-pulse
+flameshot
+mate-power-manager
+
+# Utilidades de shell y productividad
+bat
+lsd
+xclip
+fzf
+zsh-autosuggestions
+zsh-syntax-highlighting
+
+# X11, utilidades y fuentes base
+xorg-server
+xorg-xrandr
+xorg-xrdb
+xorg-xsetroot
+xorg-xev
+xorg-xprop
+xf86-input-synaptics
+fontconfig
+cantarell-fonts
+ttf-font-awesome
+noto-fonts-emoji
+
+# Dependencias de instalacion y compilacion
+git
+curl
+unzip
+base-devel

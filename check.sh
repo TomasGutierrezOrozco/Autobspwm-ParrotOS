@@ -30,7 +30,7 @@ check_commands() {
     fi
   done
 
-  local optional_commands=(synclient i3lock-fancy nvim lsd batcat fzf xclip)
+  local optional_commands=(synclient i3lock-fancy nvim lsd fzf xclip)
   for optional in "${optional_commands[@]}"; do
     if command -v "$optional" >/dev/null 2>&1; then
       status_ok "Opcional disponible: $optional"
@@ -38,9 +38,35 @@ check_commands() {
       info "Opcional no disponible en este sistema: $optional"
     fi
   done
+  if command -v batcat >/dev/null 2>&1; then
+    status_ok "Opcional disponible: batcat"
+  elif command -v bat >/dev/null 2>&1; then
+    status_ok "Opcional disponible: bat"
+  else
+    info "Opcional no disponible en este sistema: bat / batcat"
+  fi
 }
 
 check_packages() {
+  local distro
+  distro="$(detect_distro)"
+
+  if [[ "$distro" == "arch" ]]; then
+    local list_file="$PROJECT_DIR/packages/pacman.txt"
+    [[ -f "$list_file" ]] || return 0
+    while IFS= read -r pkg; do
+      [[ -n "$pkg" ]] || continue
+      if pacman -Qq "$pkg" >/dev/null 2>&1; then
+        status_ok "Paquete pacman instalado: $pkg"
+      elif pacman -Si "$pkg" >/dev/null 2>&1; then
+        info "Paquete pacman disponible en repositorios: $pkg"
+      else
+        status_warn "Paquete pacman no encontrado en repositorios: $pkg"
+      fi
+    done < <(read_package_list "$list_file")
+    return 0
+  fi
+
   local pkg list_file label
   for list_file in "$PROJECT_DIR/packages/apt.txt"; do
     [[ -f "$list_file" ]] || continue
